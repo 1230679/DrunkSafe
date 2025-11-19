@@ -1,0 +1,46 @@
+# Android / IntelliJ
+.gradle/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Build files
+**/build/
+build/
+
+# Local configuration file (sdk path, etc.)
+local.properties
+
+# Log files
+*.log
+
+# Android specific
+captures/
+.externalNativeBuild/
+.cxx/
+output.json
+
+# Keystore files
+*.jks
+*.keystore
+
+# Google services (optional: descomenta se não queres commitar)
+# app/google-services.json
+
+# Android Studio plugin files
+.gradle/
+.gradle-cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Kotlin/Java
+*.class
+
+# Native libs
+*.so
+
+# Zip/binaries (optionally track with LFS)
+*.zip
