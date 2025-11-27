@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Layout reference for SOS Activity.
+    Note: This activity uses Jetpack Compose for its UI, so this layout is provided
+    as a reference/fallback only. The actual UI is implemented in SosActivity.kt
+    using Composable functions.
+    
+    This layout can be used if switching to traditional View-based UI is preferred.
+-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/sos_background">
+
+    <!-- SOS Icon - Circular red icon in the center -->
+    <ImageView
+        android:id="@+id/sos_icon"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:src="@drawable/ic_sos"
+        android:contentDescription="@string/sos_title"
+        app:layout_constraintBottom_toTopOf="@id/trigger_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <!-- TRIGGER ALERT Button -->
+    <Button
+        android:id="@+id/trigger_button"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_sos_button"
+        android:text="@string/sos_trigger_alert"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/explanation_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Explanation text -->
+    <TextView
+        android:id="@+id/explanation_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="48dp"
+        android:gravity="center"
+        android:text="@string/sos_explanation"
+        android:textColor="@color/sos_text_secondary"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

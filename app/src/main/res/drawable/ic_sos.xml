@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Red circular background -->
+    <path
+        android:fillColor="#FFFF0000"
+        android:pathData="M60,60m-55,0a55,55 0,1 1,110 0a55,55 0,1 1,-110 0" />
+    <!-- SOS text -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M25,50 L25,70 L32,70 C38,70 40,68 40,64 C40,60 37,58 32,58 L28,58 L28,53 L32,53 C34,53 35,52 35,50 C35,48 34,47 32,47 L28,47 L28,50 L25,50 M28,61 L31,61 C33,61 34,62 34,64 C34,66 33,67 31,67 L28,67 L28,61 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M50,47 C44,47 42,51 42,58.5 C42,66 44,70 50,70 C56,70 58,66 58,58.5 C58,51 56,47 50,47 M50,50 C53,50 55,53 55,58.5 C55,64 53,67 50,67 C47,67 45,64 45,58.5 C45,53 47,50 50,50 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M65,50 L65,70 L72,70 C78,70 80,68 80,64 C80,60 77,58 72,58 L68,58 L68,53 L72,53 C74,53 75,52 75,50 C75,48 74,47 72,47 L68,47 L68,50 L65,50 M68,61 L71,61 C73,61 74,62 74,64 C74,66 73,67 71,67 L68,67 L68,61 Z" />
+</vector>

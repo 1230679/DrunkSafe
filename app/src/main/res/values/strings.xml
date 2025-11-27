@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">DrunkSafe</string>
+    <!-- SOS Screen Strings -->
+    <string name="sos_title">Emergency SOS</string>
+    <string name="sos_trigger_alert">TRIGGER ALERT</string>
+    <string name="sos_explanation">Press the button above to call emergency services (112) and send your location to your emergency contacts.</string>
+    <string name="sos_countdown_title">Emergency Alert</string>
+    <string name="sos_countdown_message">Calling emergency services and sending your location in %1$d seconds.\n\nTap Cancel to abort.</string>
+    <string name="sos_cancel">Cancel</string>
+    <string name="sos_error_no_contacts">No emergency contacts found. Please add contacts in Settings.</string>
+    <string name="sos_error_location">Unable to get your location. Sending alert without location.</string>
+    <string name="sos_error_call_permission">Call permission is required to contact emergency services.</string>
+    <string name="sos_error_sms_permission">SMS permission is required to notify your emergency contacts.</string>
+    <string name="sos_error_location_permission">Location permission is required to share your location.</string>
+    <string name="sos_error_call_failed">Failed to initiate emergency call.</string>
+    <string name="sos_error_sms_failed">Failed to send SMS to some contacts.</string>
+    <string name="sos_sms_sent">Emergency SMS sent to your contacts.</string>
+    <string name="sos_sms_message">EMERGENCY ALERT from DrunkSafe!\nI need help. My location:\nLat: %1$s, Long: %2$s\nMap: %3$s</string>
+    <string name="sos_sms_message_no_location">EMERGENCY ALERT from DrunkSafe!\nI need help. Location unavailable.</string>
 </resources>

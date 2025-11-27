@@ -7,4 +7,9 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- SOS Screen Colors -->
+    <color name="sos_background">#FF1A1A1A</color>
+    <color name="sos_red">#FFFF0000</color>
+    <color name="sos_red_dark">#FFCC0000</color>
+    <color name="sos_text_secondary">#FFB0B0B0</color>
 </resources>
