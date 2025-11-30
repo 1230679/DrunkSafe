@@ -1,13 +1,19 @@
-package com.example.drunksafe.ui
+package com.example. drunksafe.ui
 
-import androidx.compose. runtime.Composable
+import androidx.compose.runtime. Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.compose.composable
+import androidx.navigation.compose. composable
+import com.example.drunksafe.viewmodel.TrustedContactsViewModel
 
 @Composable
 fun AppNavHost(onLoggedIn: (String) -> Unit) {
     val navController = rememberNavController()
+
+    // Shared ViewModel for contacts
+    val contactsViewModel: TrustedContactsViewModel = viewModel()
+
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
             LoginScreen(
@@ -26,15 +32,22 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
         }
         composable("home") {
             HomeScreen(
-                onNavigateToContacts = { navController.navigate("trustedContacts") }
+                onNavigateToContacts = { navController.navigate("trustedContacts") },
+                onNavigateToEmergency = { navController. navigate("emergency") }
             )
         }
         composable("trustedContacts") {
             TrustedContactsScreen(
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                viewModel = contactsViewModel
             )
         }
         composable("navigation") { NavigationScreen() }
-        composable("emergency") { EmergencyScreen() }
-    }
+        composable("emergency") {
+            EmergencyScreen(
+                onNavigateBack = { navController.popBackStack() },
+                contactsViewModel = contactsViewModel
+            )
+            }
+        }
 }
