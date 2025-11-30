@@ -95,6 +95,28 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:2.3.8")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+
+    implementation("androidx.core:core-ktx:1.10.1")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.9.0")
+
+    // if you use RecyclerView/CardView later:
+    implementation("androidx.recyclerview:recyclerview:1.3.0")
+    implementation("androidx.cardview:cardview:1.0.0")
+
+    // --- Unit test dependencies (local JVM tests in src/test) ---
+    testImplementation("junit:junit:4.13.2")
+    // Optional Kotlin test helpers
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.10")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.10")
+
+    // --- Android instrumentation test dependencies (src/androidTest) ---
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test:core:1.5.0")
+    androidTestImplementation("androidx.test:rules:1.5.0")
+    androidTestImplementation("androidx.test:runner:1.5.2")
 }
 
 // Aplica o plugin google services apenas se tiveres a classpath configurada no project-level

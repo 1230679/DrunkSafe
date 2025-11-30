@@ -1,6 +1,6 @@
 package com.example.drunksafe.ui
 
-import androidx.compose.runtime.Composable
+import androidx.compose. runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
@@ -24,8 +24,16 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                 navController.navigate("home") { popUpTo("signup") { inclusive = true } }
             })
         }
-        composable("home") { HomeScreen() }
-        composable("trustedContacts") { TrustedContactsScreen() }
+        composable("home") {
+            HomeScreen(
+                onNavigateToContacts = { navController.navigate("trustedContacts") }
+            )
+        }
+        composable("trustedContacts") {
+            TrustedContactsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
         composable("navigation") { NavigationScreen() }
         composable("emergency") { EmergencyScreen() }
     }
