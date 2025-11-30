@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit. dp
 import androidx. compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.drunksafe.viewmodel.TrustedContact
+import com.example. drunksafe.data.TrustedContact
 import com.example.drunksafe.viewmodel.TrustedContactsViewModel
 import kotlinx.coroutines.delay
 

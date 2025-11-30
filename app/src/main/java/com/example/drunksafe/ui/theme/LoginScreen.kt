@@ -73,9 +73,9 @@ fun LoginScreen(
 
             // Logo
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = null,
-                modifier = Modifier.size(96.dp)
+                painter = painterResource(id = R.drawable.drunksafe_logo),
+                contentDescription = "DrunkSafe Logo",
+                modifier = Modifier.size(120.dp)  // Podes ajustar o tamanho
             )
 
             Spacer(Modifier.height(16.dp))
