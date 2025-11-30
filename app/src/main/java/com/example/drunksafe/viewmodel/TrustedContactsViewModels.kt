@@ -24,7 +24,8 @@ class TrustedContactsViewModel : ViewModel() {
             contacts = listOf(
                 TrustedContact(id = "1", name = "Anna", phoneNumber = "+351 912 345 678"),
                 TrustedContact(id = "2", name = "Jacob", phoneNumber = "+351 923 456 789"),
-                TrustedContact(id = "3", name = "William", phoneNumber = "+351 934 567 890")
+                TrustedContact(id = "3", name = "William", phoneNumber = "+351 934 567 890"),
+                TrustedContact("4", "berna","+351962412837")
             )
         )
     )
