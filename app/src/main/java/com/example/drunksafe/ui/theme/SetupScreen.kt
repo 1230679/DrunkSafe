@@ -1,17 +1,18 @@
-package com.example.drunksafe.ui
+package com. example.drunksafe.ui
 
 import androidx.compose. foundation.layout.*
 import androidx.compose. foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation. text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose. material.icons.filled.Check
-import androidx.compose.material. icons.filled.Home
+import androidx.compose.material.icons. filled.Close
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons. filled.Person
-import androidx.compose.material.icons. filled.Phone
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled. Phone
+import androidx. compose.runtime.*
 import androidx. compose.ui. Alignment
 import androidx. compose.ui. Modifier
 import androidx. compose.ui.graphics.Color
@@ -32,7 +33,8 @@ data class EmergencyContactInput(
 
 @Composable
 fun SetupScreen(
-    onSetupComplete: (List<EmergencyContactInput>, String) -> Unit
+    onSetupComplete: (List<EmergencyContactInput>, String) -> Unit,
+    onSkipSetup: () -> Unit  // ← Novo callback para saltar o setup
 ) {
     var contacts by remember {
         mutableStateOf(listOf(
@@ -43,9 +45,41 @@ fun SetupScreen(
         ))
     }
     var address by remember { mutableStateOf("") }
+    var showSkipDialog by remember { mutableStateOf(false) }
 
     // Validação
     val isFormValid = contacts.all { it.name. isNotBlank() && it.phone. isNotBlank() } && address.isNotBlank()
+
+    // Dialog de confirmação para saltar setup
+    if (showSkipDialog) {
+        AlertDialog(
+            onDismissRequest = { showSkipDialog = false },
+            backgroundColor = CardBackground,
+            title = { Text("Skip Setup? ", color = Color. White) },
+            text = {
+                Text(
+                    "You can set up your emergency contacts later in the app.  Are you sure you want to skip for now?",
+                    color = Color. Gray
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showSkipDialog = false
+                        onSkipSetup()
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = GoldAccent)
+                ) {
+                    Text("Skip", color = DarkBackground)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSkipDialog = false }) {
+                    Text("Cancel", color = GoldAccent)
+                }
+            }
+        )
+    }
 
     Surface(modifier = Modifier.fillMaxSize(), color = DarkBackground) {
         Column(
@@ -55,14 +89,28 @@ fun SetupScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(24.dp))
+            // Botão X no topo direito
+            Row(
+                modifier = Modifier. fillMaxWidth(),
+                horizontalArrangement = Arrangement. End
+            ) {
+                IconButton(onClick = { showSkipDialog = true }) {
+                    Icon(
+                        Icons. Default.Close,
+                        contentDescription = "Skip Setup",
+                        tint = Color.Gray
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
 
             // Título
             Text(
                 "Welcome to DrunkSafe! ",
                 color = GreenAccent,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
+                fontSize = 24. sp,
+                fontWeight = FontWeight. Bold
             )
 
             Spacer(Modifier.height(8.dp))
@@ -93,7 +141,7 @@ fun SetupScreen(
 
             // Morada
             Card(
-                modifier = Modifier. fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 backgroundColor = CardBackground,
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -120,7 +168,7 @@ fun SetupScreen(
                         onValueChange = { address = it },
                         label = { Text("Full Address", color = Color.Gray) },
                         placeholder = { Text("Street, City, Postal Code", color = Color.Gray) },
-                        modifier = Modifier. fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(8.dp),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             textColor = Color.White,
@@ -142,9 +190,9 @@ fun SetupScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 enabled = isFormValid,
-                colors = ButtonDefaults. buttonColors(
+                colors = ButtonDefaults.buttonColors(
                     backgroundColor = GreenAccent,
-                    disabledBackgroundColor = GreenAccent.copy(alpha = 0.5f)
+                    disabledBackgroundColor = GreenAccent. copy(alpha = 0.5f)
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -164,6 +212,17 @@ fun SetupScreen(
 
             Spacer(Modifier.height(16.dp))
 
+            // Texto para saltar
+            TextButton(onClick = { showSkipDialog = true }) {
+                Text(
+                    "Skip for now",
+                    color = GoldAccent,
+                    fontSize = 14.sp
+                )
+            }
+
+            Spacer(Modifier.height(8.dp))
+
             Text(
                 "You can edit these later in Settings",
                 color = Color.Gray,
@@ -182,23 +241,23 @@ fun ContactInputCard(
     onContactChange: (EmergencyContactInput) -> Unit
 ) {
     Card(
-        modifier = Modifier. fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         backgroundColor = CardBackground,
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12. dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier. padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    Icons.Default.Person,
+                    Icons.Default. Person,
                     contentDescription = null,
                     tint = GoldAccent,
                     modifier = Modifier.size(24.dp)
                 )
-                Spacer(Modifier.width(8. dp))
+                Spacer(Modifier.width(8.dp))
                 Text(
                     "Emergency Contact $contactNumber",
-                    color = Color. White,
-                    fontWeight = FontWeight.Bold
+                    color = Color.White,
+                    fontWeight = FontWeight. Bold
                 )
 
                 // Indicador de preenchido
@@ -208,7 +267,7 @@ fun ContactInputCard(
                         Icons.Default.Check,
                         contentDescription = "Complete",
                         tint = GreenAccent,
-                        modifier = Modifier. size(20.dp)
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
@@ -220,22 +279,22 @@ fun ContactInputCard(
                 value = contact. name,
                 onValueChange = { onContactChange(contact. copy(name = it)) },
                 label = { Text("Name", color = Color. Gray) },
-                placeholder = { Text("Contact name", color = Color. Gray) },
+                placeholder = { Text("Contact name", color = Color.Gray) },
                 leadingIcon = {
-                    Icon(Icons.Default.Person, null, tint = Color.Gray)
+                    Icon(Icons.Default.Person, null, tint = Color. Gray)
                 },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(8. dp),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    textColor = Color.White,
+                shape = RoundedCornerShape(8.dp),
+                colors = TextFieldDefaults. outlinedTextFieldColors(
+                    textColor = Color. White,
                     focusedBorderColor = GoldAccent,
-                    unfocusedBorderColor = Color.Gray,
+                    unfocusedBorderColor = Color. Gray,
                     cursorColor = GoldAccent
                 ),
                 singleLine = true
             )
 
-            Spacer(Modifier.height(8. dp))
+            Spacer(Modifier. height(8.dp))
 
             // Telefone
             OutlinedTextField(
@@ -244,11 +303,11 @@ fun ContactInputCard(
                 label = { Text("Phone", color = Color.Gray) },
                 placeholder = { Text("+351 9XX XXX XXX", color = Color.Gray) },
                 leadingIcon = {
-                    Icon(Icons.Default. Phone, null, tint = Color.Gray)
+                    Icon(Icons. Default.Phone, null, tint = Color.Gray)
                 },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(8.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                shape = RoundedCornerShape(8. dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType. Phone),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     textColor = Color.White,
                     focusedBorderColor = GoldAccent,

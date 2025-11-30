@@ -90,8 +90,15 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
         composable("setup") {
             SetupScreen(
                 onSetupComplete = { contacts, address ->
-                    val contactPairs = contacts. map { it.name to it.phone }
+                    val contactPairs = contacts.map { it.name to it.phone }
                     setupViewModel.completeSetup(contactPairs, address)
+                    navController.navigate("home") {
+                        popUpTo("setup") { inclusive = true }
+                    }
+                },
+                onSkipSetup = {
+                    // Apenas navega para home sem guardar nada
+                    // O utilizador pode fazer o setup mais tarde
                     navController.navigate("home") {
                         popUpTo("setup") { inclusive = true }
                     }

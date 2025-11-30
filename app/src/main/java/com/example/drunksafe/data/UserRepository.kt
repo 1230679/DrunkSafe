@@ -1,7 +1,10 @@
 package com.example. drunksafe.data
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import com.google.firebase.firestore.SetOptions
+
 
 data class UserProfile(
     val uid: String = "",
@@ -39,11 +42,18 @@ class UserRepository(
     }
 
     suspend fun completeSetup(uid: String, homeAddress: String) {
-        usersCollection.document(uid).update(
-            mapOf(
-                "homeAddress" to homeAddress,
-                "setupCompleted" to true
-            )
-        ).await()
+        try {
+            usersCollection.document(uid).set(
+                mapOf(
+                    "homeAddress" to homeAddress,
+                    "setupCompleted" to true
+                ),
+                SetOptions. merge()
+            ). await()
+            Log.d("UserRepository", "completeSetup SUCCESS for $uid")
+        } catch (e: Exception) {
+            Log.e("UserRepository", "completeSetup FAILED: ${e.message}")
+            throw e  // Re-throw para o ViewModel apanhar o erro
+        }
     }
 }

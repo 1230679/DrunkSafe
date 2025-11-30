@@ -43,14 +43,21 @@ class LoginViewModel(
             try {
                 val user = authRepo.signUp(email, password, displayName)
                 if (user != null) {
-                    val profile = UserProfile(uid = user.uid, email = user.email ?: "", displayName = displayName)
+                    // Criar perfil com setupCompleted = false
+                    val profile = UserProfile(
+                        uid = user. uid,
+                        email = user.email ?: "",
+                        displayName = displayName,
+                        homeAddress = "",
+                        setupCompleted = false  // ← Explicitamente false para novos utilizadores
+                    )
                     userRepo.saveUserProfile(profile)
-                    _uiState.value = AuthUiState.Success(user.uid)
+                    _uiState.value = AuthUiState.Success(user. uid)
                 } else {
-                    _uiState.value = AuthUiState. Error("User is null after signUp")
+                    _uiState.value = AuthUiState.Error("User is null after signUp")
                 }
             } catch (e: Exception) {
-                _uiState.value = AuthUiState.Error(e.message ?: "Sign up failed")
+                _uiState.value = AuthUiState. Error(e.message ?: "Sign up failed")
             }
         }
     }
