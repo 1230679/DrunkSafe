@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "37097325942",
+    "project_id": "drunksafe-e02da",
+    "storage_bucket": "drunksafe-e02da.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:37097325942:android:7e8002ffa45e0e5606a657",
+        "android_client_info": {
+          "package_name": "com.example.drunksafe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiMmeWz44oBVFa9lfP5SV7E0-8ckimWOo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

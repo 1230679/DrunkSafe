@@ -16,6 +16,7 @@ import com.example.drunksafe.viewmodel.LoginViewModel
 import com. example.drunksafe.viewmodel. SetupState
 import com.example.drunksafe.viewmodel.SetupViewModel
 import com.example.drunksafe.viewmodel.TrustedContactsViewModel
+import com.example.drunksafe.ui.MapHomeScreen
 
 private val DarkBackground = Color(0xFF072E3A)
 private val GoldAccent = Color(0xFFD8A84A)
@@ -63,7 +64,7 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             LaunchedEffect(state) {
                 when (state) {
                     is SetupState.SetupComplete -> {
-                        navController.navigate("home") {
+                        navController.navigate("dashboard") {
                             popUpTo("checkSetup") { inclusive = true }
                         }
                     }
@@ -92,33 +93,44 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                 onSetupComplete = { contacts, address ->
                     val contactPairs = contacts.map { it.name to it.phone }
                     setupViewModel.completeSetup(contactPairs, address)
-                    navController.navigate("home") {
+                    navController.navigate("dashboard") {
                         popUpTo("setup") { inclusive = true }
                     }
                 },
                 onSkipSetup = {
                     // Apenas navega para home sem guardar nada
                     // O utilizador pode fazer o setup mais tarde
-                    navController.navigate("home") {
+                    navController.navigate("dashboard") {
                         popUpTo("setup") { inclusive = true }
                     }
                 }
             )
         }
 
-        composable("home") {
-            val contactsViewModel: TrustedContactsViewModel = viewModel()
-            HomeScreen(
-                onNavigateToContacts = { navController. navigate("trustedContacts") },
-                onNavigateToEmergency = { navController.navigate("emergency") },
-                onLogout = {
-                    loginViewModel. signOut()
-                    navController.navigate("login") {
-                        popUpTo("home") { inclusive = true }
-                    }
-                }
-            )
-        }
+    composable("dashboard") {
+        val contactsViewModel: TrustedContactsViewModel = viewModel()
+
+        MapHomeScreen(
+            onTakeMeHomeClick = {
+                // Navega para a rota de "em viagem"
+                navController.navigate("route_in_progress")
+            },
+            onEmergencyAlertClick = {
+                navController.navigate("emergency")
+            },
+            onCallTrustedContactsClick = {
+                navController.navigate("trustedContacts")
+            },
+            onProfileClick = {
+                navController.navigate("profile")
+            },
+            onSearch = { query ->
+                // Lógica temporária para veres a funcionar no Logcat
+                println("O utilizador pesquisou por: $query")
+            }
+        )
+    }
+
 
         composable("trustedContacts") {
             val contactsViewModel: TrustedContactsViewModel = viewModel()
@@ -128,7 +140,7 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             )
         }
 
-        composable("navigation") { NavigationScreen() }
+       // composable("navigation") { }
 
         composable("emergency") {
             val contactsViewModel: TrustedContactsViewModel = viewModel()
