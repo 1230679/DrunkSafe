@@ -135,7 +135,6 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             )
         }
 
-       // composable("navigation") { }
 
         composable("emergency") {
             val contactsViewModel: TrustedContactsViewModel = viewModel()
@@ -158,8 +157,7 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                     println("Clicou em Profile")
                 },
                 onAddressClick = {
-                    // Futuramente: navController.navigate("edit_address")
-                    println("Clicou em Address")
+                   navController.navigate("edit_address")
                 },
                 onThemeClick = {
                     println("Clicou em Theme")
@@ -169,6 +167,14 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                 },
                 onTestEmergencyClick = {
                     navController.navigate("emergency")
+                }
+            )
+        }
+
+        composable("edit_address") {
+            HomeAddressScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
                 }
             )
         }

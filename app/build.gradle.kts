@@ -1,13 +1,12 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-// Define a versão do Ktor fora do bloco android
+
 val ktorVersion = "2.3.8"
 
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-
-    // Plugin do Google Services para Firebase
     id("com.google.gms.google-services")
 }
 
@@ -26,6 +25,18 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        val mapsApiKey = project.rootProject.file("local.properties").let {
+            if (it.exists()) {
+                val properties = Properties()
+                properties.load(it.inputStream())
+                properties.getProperty("MAPS_API_KEY") ?: ""
+            } else {
+                ""
+            }
+        }
+
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {
@@ -40,10 +51,10 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
-        // Compose Compiler compatível com Kotlin 1.9.x
         kotlinCompilerExtensionVersion = "1.5.3"
     }
 
@@ -63,29 +74,22 @@ android {
     }
 }
 
-// (opcional mas recomendado) usar toolchain para Kotlin
 kotlin {
-    jvmToolchain {
-        (17)
-    }
-}
-
-// garante que todas as tasks Kotlin compilam para a mesma JVM target
-tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+    jvmToolchain(17)
 }
 
 dependencies {
-    // --- CORE ANDROID & COMPOSE ---
+    // ==========================================================
+    // 1. CORE ANDROID & LIFECYCLE
+    // ==========================================================
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
 
-    // COMPOSE (BOM para alinhar versões)
+    // ==========================================================
+    // 2. JETPACK COMPOSE (UI)
+    // ==========================================================
     val composeBom = platform("androidx.compose:compose-bom:2024.02.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -93,41 +97,70 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material:material:1.5.4")
-    implementation("androidx.compose.material:material-icons-extended:1.5.4")
+
+    // Material Design 2 & 3
+    implementation("androidx.compose.material:material")
     implementation("androidx.compose.material3:material3")
 
-    // Maps SDK for Compose
-    implementation("com.google.maps.android:maps-compose:4.3.0")
-    // Google Maps Play Services
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
-    // Localização (GPS) - Necessário para rastreamento contínuo
-    implementation("com.google.android.gms:play-services-location:21.0.1")
-    implementation("com.google.maps.android:maps-compose-utils:4.3.0")
+    // Ícones
+    implementation("androidx.compose.material:material-icons-extended")
 
-    // --- FIREBASE ---
+    // Navegação
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("com.google.maps.android:android-maps-utils:3.8.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.9.0")
+    implementation("androidx.cardview:cardview:1.0.0")
+
+    // ==========================================================
+    // 3. GOOGLE MAPS & LOCATION
+    // ==========================================================
+    // Maps Compose (Biblioteca oficial para usar mapas no Compose)
+    implementation("com.google.maps.android:maps-compose:4.3.0")
+
+    // Google Maps SDK (Base)
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+
+    // Location Services (Para obter o GPS/FusedLocation)
+    implementation("com.google.android.gms:play-services-location:21.1.0")
+
+    // ==========================================================
+    // 4. NETWORKING (RETROFIT & GSON) - ADICIONADO AGORA
+    // ==========================================================
+    // Retrofit (Para chamar a API de Direções do Google)
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+
+    // Conversor GSON (Para transformar o JSON da API em objetos Kotlin)
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    // ==========================================================
+    // 5. NETWORKING (KTOR)
+    // ==========================================================
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+    // ==========================================================
+    // 6. FIREBASE
+    // ==========================================================
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-storage-ktx")
     // implementation("com.google.firebase:firebase-crashlytics")
 
-    // --- KTOR & SERIALIZATION ---
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-okhttp:$ktorVersion") // Motor OkHttp para Android
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-    implementation("io.ktor:ktor-client-cio:2.3.8") // Adicionado na sua lista
-
-    // Coroutines
+    // ==========================================================
+    // 7. ASSYNC & OUTROS
+    // ==========================================================
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.9.0")
-    implementation("androidx.recyclerview:recyclerview:1.3.0")
-    implementation("androidx.cardview:cardview:1.0.0")
-
+    // ==========================================================
+    // 8. TESTES
+    // ==========================================================
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.10")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.10")
