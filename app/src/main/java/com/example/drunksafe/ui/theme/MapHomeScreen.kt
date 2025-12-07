@@ -28,13 +28,15 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 
 private val GoldYellow = Color(0xFFD4A84B)
 private val DarkBlue = Color(0xFF0A1929)
-private val AlertRed = Color(0xFFD94A4A)
+private val White = Color(0xFFFFFFFF)
+
 
 @Composable
 fun GoogleMapBackground() {
@@ -121,24 +123,35 @@ fun MapHomeScreen(
         )
 
 
-        // 3. Botão "TAKE ME HOME" (Flutuante no centro-inferior)
+        // 3. Botão "TAKE ME HOME"
         Button(
             onClick = onTakeMeHomeClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(72.dp)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 24.dp)
                 .align(Alignment.BottomCenter)
-                .offset(y = (-64).dp - 16.dp),
+                .offset(y = (-110).dp),
             colors = ButtonDefaults.buttonColors(backgroundColor = GoldYellow),
-            shape = RoundedCornerShape(12.dp),
-            elevation = ButtonDefaults.elevation(defaultElevation = 8.dp)
+            shape = RoundedCornerShape(16.dp),
+            elevation = ButtonDefaults.elevation(
+                defaultElevation = 12.dp,
+                pressedElevation = 6.dp
+            )
         ) {
             Text(
-                "TAKE ME HOME",
-                color = DarkBlue,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Black
+                text = "TAKE ME HOME",
+                style = androidx.compose.ui.text.TextStyle(
+                    color = DarkBlue,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 3.sp,
+                    shadow = androidx.compose.ui.graphics.Shadow(
+                        color = Color.Black.copy(alpha = 0.2f),
+                        offset = androidx.compose.ui.geometry.Offset(2f, 2f),
+                        blurRadius = 4f
+                    )
+                )
             )
         }
 
@@ -147,36 +160,60 @@ fun MapHomeScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp)
-                .background(DarkBlue)
+                .height(80.dp)
+                .background(White)
                 .align(Alignment.BottomCenter),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onEmergencyAlertClick) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .clickable(onClick = onEmergencyAlertClick),
+                contentAlignment = Alignment.Center
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.icon_emergency),
                     contentDescription = "Emergency Alert",
-                    tint = AlertRed,
-                    modifier = Modifier.size(30.dp)
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(6.dp)
                 )
             }
 
-            IconButton(onClick = onCallTrustedContactsClick) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .clickable(onClick = onCallTrustedContactsClick),
+                contentAlignment = Alignment.Center
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.icon_contactos),
                     contentDescription = "Trusted Contacts",
-                    tint = Color.White,
-                    modifier = Modifier.size(30.dp)
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(6.dp)
                 )
             }
 
-            IconButton(onClick = onProfileClick) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .clickable(onClick = onProfileClick),
+                contentAlignment = Alignment.Center
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.icon_perfil),
                     contentDescription = "Profile",
-                    tint = Color.White,
-                    modifier = Modifier.size(30.dp)
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(6.dp)
                 )
             }
         }

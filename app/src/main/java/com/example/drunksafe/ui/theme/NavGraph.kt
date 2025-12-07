@@ -77,7 +77,6 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                 }
             }
 
-            // Loading enquanto verifica
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = DarkBackground
@@ -108,11 +107,8 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
         }
 
     composable("dashboard") {
-        val contactsViewModel: TrustedContactsViewModel = viewModel()
-
         MapHomeScreen(
             onTakeMeHomeClick = {
-                // Navega para a rota de "em viagem"
                 navController.navigate("route_in_progress")
             },
             onEmergencyAlertClick = {
@@ -125,7 +121,6 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                 navController.navigate("profile")
             },
             onSearch = { query ->
-                // Lógica temporária para veres a funcionar no Logcat
                 println("O utilizador pesquisou por: $query")
             }
         )
@@ -147,6 +142,34 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             EmergencyScreen(
                 onNavigateBack = { navController. popBackStack() },
                 contactsViewModel = contactsViewModel
+            )
+        }
+
+        composable("profile") {
+            ProfileScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onLogout = {
+                    loginViewModel.signOut()
+                    navController.navigate("login") { popUpTo(0) { inclusive = true } }
+                },
+
+                onProfileClick = {
+                    // Futuramente: navController.navigate("edit_profile")
+                    println("Clicou em Profile")
+                },
+                onAddressClick = {
+                    // Futuramente: navController.navigate("edit_address")
+                    println("Clicou em Address")
+                },
+                onThemeClick = {
+                    println("Clicou em Theme")
+                },
+                onTermsClick = {
+                    println("Clicou em Terms")
+                },
+                onTestEmergencyClick = {
+                    navController.navigate("emergency")
+                }
             )
         }
     }
