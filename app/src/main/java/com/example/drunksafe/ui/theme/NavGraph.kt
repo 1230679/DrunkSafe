@@ -16,6 +16,7 @@ import com.example.drunksafe.viewmodel.LoginViewModel
 import com. example.drunksafe.viewmodel. SetupState
 import com.example.drunksafe.viewmodel.SetupViewModel
 import com.example.drunksafe.viewmodel.TrustedContactsViewModel
+import com.example.drunksafe.ui.MapHomeScreen
 
 private val DarkBackground = Color(0xFF072E3A)
 private val GoldAccent = Color(0xFFD8A84A)
@@ -31,8 +32,7 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             LoginScreen(
                 onLoginSuccess = { uid ->
                     onLoggedIn(uid)
-                    // LOGIN: Go directly to home, no setup check
-                    navController.navigate("home") {
+                    navController.navigate("checkSetup") {
                         popUpTo("login") { inclusive = true }
                     }
                 },
@@ -45,7 +45,6 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             SignUpScreen(
                 onSignUpDone = { uid ->
                     onLoggedIn(uid)
-                    // SIGN UP: Go to setup screen
                     navController.navigate("setup") {
                         popUpTo("signup") { inclusive = true }
                     }
@@ -55,7 +54,39 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             )
         }
 
-        // Removed "checkSetup" composable - no longer needed
+        composable("checkSetup") {
+            val state by setupViewModel.state. collectAsState()
+
+            LaunchedEffect(Unit) {
+                setupViewModel.checkIfSetupNeeded()
+            }
+
+            LaunchedEffect(state) {
+                when (state) {
+                    is SetupState.SetupComplete -> {
+                        navController.navigate("home") {
+                            popUpTo("checkSetup") { inclusive = true }
+                        }
+                    }
+                    is SetupState. NeedsSetup -> {
+                        navController.navigate("setup") {
+                            popUpTo("checkSetup") { inclusive = true }
+                        }
+                    }
+                    else -> {}
+                }
+            }
+
+            // Loading enquanto verifica
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = DarkBackground
+            ) {
+                Box(contentAlignment = Alignment. Center) {
+                    CircularProgressIndicator(color = GoldAccent)
+                }
+            }
+        }
 
         composable("setup") {
             SetupScreen(
@@ -67,12 +98,13 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                         emptyList()
                     }
                     setupViewModel.completeSetup(contactPairs, address)
-                    navController.navigate("home") {
+                    navController.navigate("dashboard") {
                         popUpTo("setup") { inclusive = true }
                     }
                 },
                 onSkipSetup = {
-                    // Just navigate to home without saving anything
+                    // Apenas navega para home sem guardar nada
+                    // O utilizador pode fazer o setup mais tarde
                     navController.navigate("home") {
                         popUpTo("setup") { inclusive = true }
                     }
@@ -80,19 +112,26 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             )
         }
 
-        composable("home") {
-            val contactsViewModel: TrustedContactsViewModel = viewModel()
-            HomeScreen(
-                onNavigateToContacts = { navController.navigate("trustedContacts") },
-                onNavigateToEmergency = { navController. navigate("emergency") },
-                onLogout = {
-                    loginViewModel.signOut()
-                    navController.navigate("login") {
-                        popUpTo("home") { inclusive = true }
-                    }
-                }
-            )
-        }
+    composable("dashboard") {
+        MapHomeScreen(
+            onTakeMeHomeClick = {
+                navController.navigate("route_in_progress")
+            },
+            onEmergencyAlertClick = {
+                navController.navigate("emergency")
+            },
+            onCallTrustedContactsClick = {
+                navController.navigate("trustedContacts")
+            },
+            onProfileClick = {
+                navController.navigate("profile")
+            },
+            onSearch = { query ->
+                println("O utilizador pesquisou por: $query")
+            }
+        )
+    }
+
 
         composable("trustedContacts") {
             val contactsViewModel: TrustedContactsViewModel = viewModel()
@@ -109,6 +148,41 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             EmergencyScreen(
                 onNavigateBack = { navController.popBackStack() },
                 contactsViewModel = contactsViewModel
+            )
+        }
+
+        composable("profile") {
+            ProfileScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onLogout = {
+                    loginViewModel.signOut()
+                    navController.navigate("login") { popUpTo(0) { inclusive = true } }
+                },
+
+                onProfileClick = {
+                    // Futuramente: navController.navigate("edit_profile")
+                    println("Clicou em Profile")
+                },
+                onAddressClick = {
+                   navController.navigate("edit_address")
+                },
+                onThemeClick = {
+                    println("Clicou em Theme")
+                },
+                onTermsClick = {
+                    println("Clicou em Terms")
+                },
+                onTestEmergencyClick = {
+                    navController.navigate("emergency")
+                }
+            )
+        }
+
+        composable("edit_address") {
+            HomeAddressScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
             )
         }
     }
