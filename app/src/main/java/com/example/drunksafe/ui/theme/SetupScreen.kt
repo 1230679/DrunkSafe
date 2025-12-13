@@ -67,17 +67,17 @@ data class EmergencyContactInput(
 
 @Composable
 fun SetupScreen(
-    onSetupComplete: (EmergencyContactInput?, String) -> Unit,
+    onSetupComplete: (List<EmergencyContactInput>, String) -> Unit,
     onSkipSetup: () -> Unit
 ) {
-    var contact by remember { mutableStateOf(EmergencyContactInput()) }
+    var contacts by remember { mutableStateOf(listOf(EmergencyContactInput())) }
     var address by remember { mutableStateOf("") }
     var showSkipDialog by remember { mutableStateOf(false) }
 
     // Validation - contact is optional, but if filled, both fields must be complete
-    val isContactValid = (contact.name. isBlank() && contact.phone.isBlank()) ||
-            (contact.name. isNotBlank() && contact.phone. isNotBlank())
-    val isFormValid = address.isNotBlank() && isContactValid
+    val hasAtLeastOneValidContact = contacts.any { it.name.isNotBlank() && it.phone.isNotBlank() }
+
+    val isFormValid = address.isNotBlank() && hasAtLeastOneValidContact
 
     // Skip confirmation dialog
     if (showSkipDialog) {
@@ -153,12 +153,28 @@ fun SetupScreen(
             Spacer(Modifier.height(32.dp))
 
             // Single Emergency Contact Card
-            ContactInputCard(
-                contact = contact,
-                onContactChange = { newContact ->
-                    contact = newContact
-                }
-            )
+// For each contact, show the input card
+            contacts.forEachIndexed { index, contact ->
+                ContactInputCard(
+                    contact = contact,
+                    onContactChange = { newContact ->
+                        contacts = contacts.toMutableList().apply { this[index] = newContact }
+                    }
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+
+// "Add more trusted contacts" button
+            OutlinedButton(
+                onClick = { contacts = contacts + EmergencyContactInput() },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                border = ButtonDefaults.outlinedBorder.copy(
+                    brush = androidx.compose.ui.graphics.SolidColor(GoldAccent)
+                )
+            ) {
+                Text("Add more trusted contacts", color = GoldAccent)
+            }
 
             Spacer(Modifier.height(24.dp))
 
@@ -209,13 +225,8 @@ fun SetupScreen(
             // Complete Setup Button
             Button(
                 onClick = {
-                    val contactToSave = if (contact.name. isNotBlank() && contact.phone.isNotBlank()) {
-                        // Combine country code with phone number
-                        contact.copy(phone = "${contact.countryCode.code}${contact.phone}")
-                    } else {
-                        null
-                    }
-                    onSetupComplete(contactToSave, address)
+                    val validContacts = contacts.filter { it.name.isNotBlank() && it.phone.isNotBlank() }
+                    onSetupComplete(validContacts, address)
                 },
                 modifier = Modifier
                     .fillMaxWidth()

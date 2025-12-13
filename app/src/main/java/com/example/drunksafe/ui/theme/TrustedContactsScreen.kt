@@ -23,6 +23,10 @@ import androidx. compose.ui.unit.sp
 import androidx.compose.ui. window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example. drunksafe. data.TrustedContact
+import com.example.drunksafe.ui.theme.CountryCode
+import com.example.drunksafe.ui.theme.PhoneInputWithCountryCode
+import com.example.drunksafe.ui.theme.countryCodes
+import com.example.drunksafe.ui.theme.formatFullPhoneNumber
 import com. example.drunksafe.viewmodel. TrustedContactsViewModel
 
 private val DarkBlue = Color(0xFF0A1929)
@@ -414,7 +418,7 @@ fun SendMessageDialog(
 fun AddContactDialog(onDismiss: () -> Unit, onAddContact: (String, String) -> Unit) {
     var name by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
-
+    var selectedCountryCode by remember { mutableStateOf<CountryCode>(countryCodes[0]) }
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
@@ -433,6 +437,7 @@ fun AddContactDialog(onDismiss: () -> Unit, onAddContact: (String, String) -> Un
 
                 Spacer(modifier = Modifier. height(16.dp))
 
+
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
@@ -450,19 +455,14 @@ fun AddContactDialog(onDismiss: () -> Unit, onAddContact: (String, String) -> Un
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                OutlinedTextField(
-                    value = phone,
-                    onValueChange = { phone = it },
-                    label = { Text("Phone Number", color = Color.Gray) },
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        textColor = Color.White,
-                        focusedBorderColor = GoldYellow,
-                        unfocusedBorderColor = Color.Gray,
-                        cursorColor = GoldYellow,
-                        focusedLabelColor = GoldYellow
-                    ),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                PhoneInputWithCountryCode(
+                    phoneNumber = phone,
+                    countryCode = selectedCountryCode,
+                    onPhoneNumberChange = { phone = it },
+                    onCountryCodeChange = { selectedCountryCode = it },
+                    focusedBorderColor = GoldYellow,
+                    textColor = Color.White,
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -480,7 +480,7 @@ fun AddContactDialog(onDismiss: () -> Unit, onAddContact: (String, String) -> Un
                     Button(
                         onClick = {
                             if (name.isNotBlank()) {
-                                onAddContact(name. trim(), phone.trim())
+                                onAddContact(name.trim(), formatFullPhoneNumber(selectedCountryCode, phone))
                             }
                         },
                         colors = ButtonDefaults.buttonColors(backgroundColor = GoldYellow)
@@ -491,4 +491,5 @@ fun AddContactDialog(onDismiss: () -> Unit, onAddContact: (String, String) -> Un
             }
         }
     }
+
 }

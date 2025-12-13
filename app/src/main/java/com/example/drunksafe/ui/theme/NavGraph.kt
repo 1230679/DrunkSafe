@@ -1,15 +1,15 @@
-package com.example. drunksafe.ui
+package com.example.drunksafe.ui
 
-import androidx.compose. foundation.layout. Box
-import androidx.compose.foundation.layout. fillMaxSize
+import androidx.compose. foundation.layout.Box
+import androidx.compose. foundation.layout.fillMaxSize
 import androidx.compose.material. CircularProgressIndicator
 import androidx.compose. material.Surface
 import androidx.compose.runtime.*
-import androidx. compose.ui. Alignment
-import androidx. compose.ui. Modifier
-import androidx. compose.ui.graphics.Color
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx. navigation.compose.NavHost
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
 import com.example.drunksafe.viewmodel.LoginViewModel
@@ -32,11 +32,11 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             LoginScreen(
                 onLoginSuccess = { uid ->
                     onLoggedIn(uid)
-                    navController.navigate("checkSetup") {
+                    navController.navigate("dashboard") {
                         popUpTo("login") { inclusive = true }
                     }
                 },
-                onSignUpRequested = { navController.navigate("signup") },
+                onSignUpRequested = { navController. navigate("signup") },
                 viewModel = loginViewModel
             )
         }
@@ -64,7 +64,7 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             LaunchedEffect(state) {
                 when (state) {
                     is SetupState.SetupComplete -> {
-                        navController.navigate("home") {
+                        navController.navigate("dashboard") {
                             popUpTo("checkSetup") { inclusive = true }
                         }
                     }
@@ -77,7 +77,6 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                 }
             }
 
-            // Loading enquanto verifica
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = DarkBackground
@@ -90,13 +89,8 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
 
         composable("setup") {
             SetupScreen(
-                onSetupComplete = { contact, address ->
-                    // contact is now a single EmergencyContactInput (or null)
-                    val contactPairs = if (contact != null && contact.name.isNotBlank() && contact.phone.isNotBlank()) {
-                        listOf(contact. name to contact.phone)
-                    } else {
-                        emptyList()
-                    }
+                onSetupComplete = { contacts, address ->
+                    val contactPairs = contacts.map { it.name to it.phone }
                     setupViewModel.completeSetup(contactPairs, address)
                     navController.navigate("dashboard") {
                         popUpTo("setup") { inclusive = true }
@@ -105,48 +99,47 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                 onSkipSetup = {
                     // Apenas navega para home sem guardar nada
                     // O utilizador pode fazer o setup mais tarde
-                    navController.navigate("home") {
+                    navController.navigate("dashboard") {
                         popUpTo("setup") { inclusive = true }
                     }
                 }
             )
         }
 
-    composable("dashboard") {
-        MapHomeScreen(
-            onTakeMeHomeClick = {
-                navController.navigate("route_in_progress")
-            },
-            onEmergencyAlertClick = {
-                navController.navigate("emergency")
-            },
-            onCallTrustedContactsClick = {
-                navController.navigate("trustedContacts")
-            },
-            onProfileClick = {
-                navController.navigate("profile")
-            },
-            onSearch = { query ->
-                println("O utilizador pesquisou por: $query")
-            }
-        )
-    }
+        composable("dashboard") {
+            MapHomeScreen(
+                onTakeMeHomeClick = {
+                    navController.navigate("route_in_progress")
+                },
+                onEmergencyAlertClick = {
+                    navController.navigate("emergency")
+                },
+                onCallTrustedContactsClick = {
+                    navController.navigate("trustedContacts")
+                },
+                onProfileClick = {
+                    navController.navigate("profile")
+                },
+                onSearch = { query ->
+                    println("O utilizador pesquisou por: $query")
+                }
+            )
+        }
 
 
         composable("trustedContacts") {
             val contactsViewModel: TrustedContactsViewModel = viewModel()
             TrustedContactsScreen(
-                onNavigateBack = { navController. popBackStack() },
+                onNavigateBack = { navController.popBackStack() },
                 viewModel = contactsViewModel
             )
         }
 
-        composable("navigation") { NavigationScreen() }
 
         composable("emergency") {
             val contactsViewModel: TrustedContactsViewModel = viewModel()
             EmergencyScreen(
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = { navController. popBackStack() },
                 contactsViewModel = contactsViewModel
             )
         }
@@ -164,7 +157,7 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                     println("Clicou em Profile")
                 },
                 onAddressClick = {
-                   navController.navigate("edit_address")
+                    navController.navigate("edit_address")
                 },
                 onThemeClick = {
                     println("Clicou em Theme")
