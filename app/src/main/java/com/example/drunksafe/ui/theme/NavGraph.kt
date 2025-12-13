@@ -1,15 +1,15 @@
-package com.example.drunksafe.ui
+package com.example. drunksafe.ui
 
-import androidx.compose. foundation.layout.Box
-import androidx.compose. foundation.layout.fillMaxSize
+import androidx.compose. foundation.layout. Box
+import androidx.compose.foundation.layout. fillMaxSize
 import androidx.compose.material. CircularProgressIndicator
 import androidx.compose. material.Surface
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx. compose.ui. Alignment
+import androidx. compose.ui. Modifier
+import androidx. compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.NavHost
+import androidx. navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
 import com.example.drunksafe.viewmodel.LoginViewModel
@@ -36,7 +36,7 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                         popUpTo("login") { inclusive = true }
                     }
                 },
-                onSignUpRequested = { navController. navigate("signup") },
+                onSignUpRequested = { navController.navigate("signup") },
                 viewModel = loginViewModel
             )
         }
@@ -64,7 +64,7 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             LaunchedEffect(state) {
                 when (state) {
                     is SetupState.SetupComplete -> {
-                        navController.navigate("dashboard") {
+                        navController.navigate("home") {
                             popUpTo("checkSetup") { inclusive = true }
                         }
                     }
@@ -77,6 +77,7 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                 }
             }
 
+            // Loading enquanto verifica
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = DarkBackground
@@ -89,8 +90,13 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
 
         composable("setup") {
             SetupScreen(
-                onSetupComplete = { contacts, address ->
-                    val contactPairs = contacts.map { it.name to it.phone }
+                onSetupComplete = { contact, address ->
+                    // contact is now a single EmergencyContactInput (or null)
+                    val contactPairs = if (contact != null && contact.name.isNotBlank() && contact.phone.isNotBlank()) {
+                        listOf(contact. name to contact.phone)
+                    } else {
+                        emptyList()
+                    }
                     setupViewModel.completeSetup(contactPairs, address)
                     navController.navigate("dashboard") {
                         popUpTo("setup") { inclusive = true }
@@ -99,7 +105,7 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                 onSkipSetup = {
                     // Apenas navega para home sem guardar nada
                     // O utilizador pode fazer o setup mais tarde
-                    navController.navigate("dashboard") {
+                    navController.navigate("home") {
                         popUpTo("setup") { inclusive = true }
                     }
                 }
@@ -130,16 +136,17 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
         composable("trustedContacts") {
             val contactsViewModel: TrustedContactsViewModel = viewModel()
             TrustedContactsScreen(
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = { navController. popBackStack() },
                 viewModel = contactsViewModel
             )
         }
 
+        composable("navigation") { NavigationScreen() }
 
         composable("emergency") {
             val contactsViewModel: TrustedContactsViewModel = viewModel()
             EmergencyScreen(
-                onNavigateBack = { navController. popBackStack() },
+                onNavigateBack = { navController.popBackStack() },
                 contactsViewModel = contactsViewModel
             )
         }

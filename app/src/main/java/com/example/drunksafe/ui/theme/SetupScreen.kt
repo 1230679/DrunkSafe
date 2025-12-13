@@ -1,22 +1,24 @@
-package com. example.drunksafe.ui
+package com.example. drunksafe. ui
 
-import androidx.compose. foundation.layout.*
-import androidx.compose. foundation.rememberScrollState
+import androidx.compose. foundation.clickable
+import androidx. compose.foundation.layout.*
+import androidx. compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation. text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
+import androidx.compose. foundation.text.KeyboardOptions
+import androidx.compose.foundation. verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose. material.icons.filled.Check
+import androidx.compose. material.icons.filled.ArrowDropDown
+import androidx. compose.material.icons.filled.Check
 import androidx.compose.material.icons. filled.Close
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons. filled.Home
 import androidx.compose.material.icons. filled.Person
-import androidx.compose.material.icons.filled. Phone
-import androidx. compose.runtime.*
-import androidx. compose.ui. Alignment
-import androidx. compose.ui. Modifier
-import androidx. compose.ui.graphics.Color
-import androidx.compose.ui. text.font.FontWeight
+import androidx.compose.material.icons. filled.Phone
+import androidx.compose.runtime.*
+import androidx. compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose. ui.text.font.FontWeight
 import androidx.compose.ui.text. input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui. unit.sp
@@ -26,31 +28,58 @@ private val GoldAccent = Color(0xFFD8A84A)
 private val GreenAccent = Color(0xFF7FD08A)
 private val CardBackground = Color(0xFF0D2137)
 
+// Data class for country codes
+data class CountryCode(
+    val country: String,
+    val code: String,
+    val flag: String
+)
+
+// List of common country codes
+val countryCodes = listOf(
+    CountryCode("Portugal", "+351", "🇵🇹"),
+    CountryCode("Spain", "+34", "🇪🇸"),
+    CountryCode("France", "+33", "🇫🇷"),
+    CountryCode("Germany", "+49", "🇩🇪"),
+    CountryCode("Italy", "+39", "🇮🇹"),
+    CountryCode("United Kingdom", "+44", "🇬🇧"),
+    CountryCode("United States", "+1", "🇺🇸"),
+    CountryCode("Brazil", "+55", "🇧🇷"),
+    CountryCode("Netherlands", "+31", "🇳🇱"),
+    CountryCode("Belgium", "+32", "🇧🇪"),
+    CountryCode("Switzerland", "+41", "🇨🇭"),
+    CountryCode("Ireland", "+353", "🇮🇪"),
+    CountryCode("Poland", "+48", "🇵🇱"),
+    CountryCode("Austria", "+43", "🇦🇹"),
+    CountryCode("Sweden", "+46", "🇸🇪"),
+    CountryCode("Norway", "+47", "🇳🇴"),
+    CountryCode("Denmark", "+45", "🇩🇰"),
+    CountryCode("Finland", "+358", "🇫🇮"),
+    CountryCode("Greece", "+30", "🇬🇷"),
+    CountryCode("Canada", "+1", "🇨🇦")
+)
+
 data class EmergencyContactInput(
     val name: String = "",
-    val phone: String = ""
+    val phone: String = "",
+    val countryCode: CountryCode = countryCodes[0] // Default to Portugal
 )
 
 @Composable
 fun SetupScreen(
-    onSetupComplete: (List<EmergencyContactInput>, String) -> Unit,
-    onSkipSetup: () -> Unit  // ← Novo callback para saltar o setup
+    onSetupComplete: (EmergencyContactInput?, String) -> Unit,
+    onSkipSetup: () -> Unit
 ) {
-    var contacts by remember {
-        mutableStateOf(listOf(
-            EmergencyContactInput(),
-            EmergencyContactInput(),
-            EmergencyContactInput(),
-            EmergencyContactInput()
-        ))
-    }
+    var contact by remember { mutableStateOf(EmergencyContactInput()) }
     var address by remember { mutableStateOf("") }
     var showSkipDialog by remember { mutableStateOf(false) }
 
-    // Validação
-    val isFormValid = contacts.all { it.name. isNotBlank() && it.phone. isNotBlank() } && address.isNotBlank()
+    // Validation - contact is optional, but if filled, both fields must be complete
+    val isContactValid = (contact.name. isBlank() && contact.phone.isBlank()) ||
+            (contact.name. isNotBlank() && contact.phone. isNotBlank())
+    val isFormValid = address.isNotBlank() && isContactValid
 
-    // Dialog de confirmação para saltar setup
+    // Skip confirmation dialog
     if (showSkipDialog) {
         AlertDialog(
             onDismissRequest = { showSkipDialog = false },
@@ -58,7 +87,7 @@ fun SetupScreen(
             title = { Text("Skip Setup? ", color = Color. White) },
             text = {
                 Text(
-                    "You can set up your emergency contacts later in the app.  Are you sure you want to skip for now?",
+                    "You can set up your emergency contact later in the app.  Are you sure you want to skip for now?",
                     color = Color. Gray
                 )
             },
@@ -89,10 +118,10 @@ fun SetupScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Botão X no topo direito
+            // X button at top right
             Row(
                 modifier = Modifier. fillMaxWidth(),
-                horizontalArrangement = Arrangement. End
+                horizontalArrangement = Arrangement.End
             ) {
                 IconButton(onClick = { showSkipDialog = true }) {
                     Icon(
@@ -105,41 +134,35 @@ fun SetupScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            // Título
+            // Title
             Text(
                 "Welcome to DrunkSafe! ",
                 color = GreenAccent,
-                fontSize = 24. sp,
-                fontWeight = FontWeight. Bold
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
             )
 
             Spacer(Modifier.height(8.dp))
 
             Text(
-                "Let's set up your emergency contacts",
+                "Let's set up your emergency contact",
                 color = Color.Gray,
                 fontSize = 14.sp
             )
 
             Spacer(Modifier.height(32.dp))
 
-            // 4 Contactos de Emergência
-            contacts.forEachIndexed { index, contact ->
-                ContactInputCard(
-                    contactNumber = index + 1,
-                    contact = contact,
-                    onContactChange = { newContact ->
-                        contacts = contacts.toMutableList().apply {
-                            this[index] = newContact
-                        }
-                    }
-                )
-                Spacer(Modifier.height(16.dp))
-            }
+            // Single Emergency Contact Card
+            ContactInputCard(
+                contact = contact,
+                onContactChange = { newContact ->
+                    contact = newContact
+                }
+            )
 
-            Spacer(Modifier. height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
-            // Morada
+            // Home Address
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 backgroundColor = CardBackground,
@@ -183,16 +206,24 @@ fun SetupScreen(
 
             Spacer(Modifier.height(32.dp))
 
-            // Botão Continuar
+            // Complete Setup Button
             Button(
-                onClick = { onSetupComplete(contacts, address) },
+                onClick = {
+                    val contactToSave = if (contact.name. isNotBlank() && contact.phone.isNotBlank()) {
+                        // Combine country code with phone number
+                        contact.copy(phone = "${contact.countryCode.code}${contact.phone}")
+                    } else {
+                        null
+                    }
+                    onSetupComplete(contactToSave, address)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
                 enabled = isFormValid,
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = GreenAccent,
-                    disabledBackgroundColor = GreenAccent. copy(alpha = 0.5f)
+                    disabledBackgroundColor = GreenAccent.copy(alpha = 0.5f)
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -205,14 +236,14 @@ fun SetupScreen(
                 Text(
                     "Complete Setup",
                     color = DarkBackground,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight. Bold,
                     fontSize = 16.sp
                 )
             }
 
             Spacer(Modifier.height(16.dp))
 
-            // Texto para saltar
+            // Skip text button
             TextButton(onClick = { showSkipDialog = true }) {
                 Text(
                     "Skip for now",
@@ -224,7 +255,7 @@ fun SetupScreen(
             Spacer(Modifier.height(8.dp))
 
             Text(
-                "You can edit these later in Settings",
+                "You can add more contacts later in Settings",
                 color = Color.Gray,
                 fontSize = 12.sp
             )
@@ -236,32 +267,33 @@ fun SetupScreen(
 
 @Composable
 fun ContactInputCard(
-    contactNumber: Int,
     contact: EmergencyContactInput,
     onContactChange: (EmergencyContactInput) -> Unit
 ) {
+    var showCountryDropdown by remember { mutableStateOf(false) }
+
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier. fillMaxWidth(),
         backgroundColor = CardBackground,
-        shape = RoundedCornerShape(12. dp)
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Column(modifier = Modifier. padding(16.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    Icons.Default. Person,
+                    Icons.Default.Person,
                     contentDescription = null,
                     tint = GoldAccent,
                     modifier = Modifier.size(24.dp)
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(8. dp))
                 Text(
-                    "Emergency Contact $contactNumber",
-                    color = Color.White,
-                    fontWeight = FontWeight. Bold
+                    "Emergency Contact",
+                    color = Color. White,
+                    fontWeight = FontWeight.Bold
                 )
 
-                // Indicador de preenchido
-                if (contact.name.isNotBlank() && contact.phone. isNotBlank()) {
+                // Filled indicator
+                if (contact.name. isNotBlank() && contact.phone. isNotBlank()) {
                     Spacer(Modifier.weight(1f))
                     Icon(
                         Icons.Default.Check,
@@ -274,9 +306,9 @@ fun ContactInputCard(
 
             Spacer(Modifier.height(12.dp))
 
-            // Nome
+            // Name
             OutlinedTextField(
-                value = contact. name,
+                value = contact.name,
                 onValueChange = { onContactChange(contact. copy(name = it)) },
                 label = { Text("Name", color = Color. Gray) },
                 placeholder = { Text("Contact name", color = Color.Gray) },
@@ -296,26 +328,89 @@ fun ContactInputCard(
 
             Spacer(Modifier. height(8.dp))
 
-            // Telefone
-            OutlinedTextField(
-                value = contact.phone,
-                onValueChange = { onContactChange(contact.copy(phone = it)) },
-                label = { Text("Phone", color = Color.Gray) },
-                placeholder = { Text("+351 9XX XXX XXX", color = Color.Gray) },
-                leadingIcon = {
-                    Icon(Icons. Default.Phone, null, tint = Color.Gray)
-                },
+            // Phone with Country Code Selector
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(8. dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType. Phone),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    textColor = Color.White,
-                    focusedBorderColor = GoldAccent,
-                    unfocusedBorderColor = Color.Gray,
-                    cursorColor = GoldAccent
-                ),
-                singleLine = true
-            )
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Country Code Dropdown
+                Box {
+                    OutlinedButton(
+                        onClick = { showCountryDropdown = true },
+                        modifier = Modifier
+                            .width(120.dp)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(8. dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            backgroundColor = Color. Transparent,
+                            contentColor = Color.White
+                        ),
+                        border = ButtonDefaults.outlinedBorder. copy(
+                            brush = androidx.compose.ui. graphics.SolidColor(Color.Gray)
+                        )
+                    ) {
+                        Text(
+                            text = "${contact.countryCode.flag} ${contact.countryCode.code}",
+                            color = Color.White,
+                            fontSize = 14.sp
+                        )
+                        Icon(
+                            Icons.Default.ArrowDropDown,
+                            contentDescription = "Select country",
+                            tint = Color.Gray
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = showCountryDropdown,
+                        onDismissRequest = { showCountryDropdown = false },
+                        modifier = Modifier
+                            .width(250.dp)
+                            .heightIn(max = 300.dp)
+                    ) {
+                        countryCodes.forEach { countryCode ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    onContactChange(contact. copy(countryCode = countryCode))
+                                    showCountryDropdown = false
+                                }
+                            ) {
+                                Text(
+                                    text = "${countryCode.flag} ${countryCode.country} (${countryCode.code})",
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(Modifier.width(8. dp))
+
+                // Phone Number Field (numbers only)
+                OutlinedTextField(
+                    value = contact.phone,
+                    onValueChange = { newValue ->
+                        // Only allow digits
+                        val digitsOnly = newValue.filter { it. isDigit() }
+                        onContactChange(contact. copy(phone = digitsOnly))
+                    },
+                    label = { Text("Phone", color = Color.Gray) },
+                    placeholder = { Text("912345678", color = Color.Gray) },
+                    leadingIcon = {
+                        Icon(Icons.Default.Phone, null, tint = Color. Gray)
+                    },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(8.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType. Number),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = Color.White,
+                        focusedBorderColor = GoldAccent,
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = GoldAccent
+                    ),
+                    singleLine = true
+                )
+            }
         }
     }
 }
