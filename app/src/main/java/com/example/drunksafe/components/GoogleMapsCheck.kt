@@ -17,9 +17,7 @@ fun GoogleMapsCheckDialog() {
     var showDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        if (!isGoogleMapsInstalled(context)) {
-            showDialog = true
-        }
+        showDialog = true
     }
 
     if (showDialog) {
