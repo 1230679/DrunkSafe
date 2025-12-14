@@ -182,12 +182,29 @@ fun SetupScreen(
             Spacer(Modifier.Companion.height(32.dp))
 
             // Single Emergency Contact Card
-            ContactInputCard(
-                contact = contact,
-                onContactChange = { newContact ->
-                    contact = newContact
-                }
-            )
+            // For each contact, show the input card
+            contacts.forEachIndexed { index, contact ->
+                ContactInputCard(
+                    contact = contact,
+                    onContactChange = { newContact ->
+                        contacts = contacts.toMutableList().apply { this[index] = newContact }
+                    }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+
+            // "Add more trusted contacts" button
+            OutlinedButton(
+                onClick = { contacts = contacts + EmergencyContactInput() },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                border = ButtonDefaults.outlinedBorder.copy(
+                    brush = androidx.compose.ui.graphics.SolidColor(GoldAccent)
+                )
+            ) {
+                Text("Add more trusted contacts", color = GoldAccent)
+            }
 
             Spacer(Modifier.Companion.height(24.dp))
 

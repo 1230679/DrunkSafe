@@ -48,6 +48,10 @@ val countryCodes = listOf(
     CountryCode("Canada", "+1", "🇨🇦")
 )
 
+fun formatFullPhoneNumber(countryCode: CountryCode, phoneNumber: String): String {
+    return "${countryCode.code}${phoneNumber}"
+}
+
 /**
  * Reusable phone input with country code selector
  * @param phoneNumber The phone number without country code (digits only)
@@ -59,6 +63,7 @@ val countryCodes = listOf(
  * @param textColor Color for text
  * @param modifier Modifier for the component
  */
+
 @Composable
 fun PhoneInputWithCountryCode(
     phoneNumber: String,
@@ -142,7 +147,7 @@ fun PhoneInputWithCountryCode(
             leadingIcon = {
                 Icon(Icons.Default.Phone, null, tint = Color.Gray)
             },
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8. dp),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType. Number),
             colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -151,14 +156,7 @@ fun PhoneInputWithCountryCode(
                 unfocusedBorderColor = unfocusedBorderColor,
                 cursorColor = focusedBorderColor
             ),
-            singleLine = true
-        )
+            singleLine = true,
+            )
     }
-}
-
-/**
- * Combines country code with phone number
- */
-fun formatFullPhoneNumber(countryCode: CountryCode, phoneNumber: String): String {
-    return "${countryCode.code}${phoneNumber}"
 }
