@@ -1,13 +1,11 @@
 package com.example.drunksafe.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,13 +14,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// --- Cores ---
-private val BackgroundDark = Color(0xFF001524)
-private val ItemBlue = Color(0xFF062135)
-private val GoldYellow = Color(0xFFE0AA4E)
-private val AlertRed = Color(0xFFD90000)
-private val SearchGrey = Color(0xFFB0B0B0)
-private val GreenArrow = Color(0xFF4CAF50)
+import com.example.drunksafe.ui.theme.BackgroundDark
+import com.example.drunksafe.ui.theme.ItemBlue
+import com.example.drunksafe.ui.theme.AlertRed
+import com.example.drunksafe.ui.theme.GoldYellow
+import com.example.drunksafe.ui.theme.GreenArrow
 
 @Composable
 fun ProfileScreen(

@@ -22,12 +22,11 @@ import androidx.compose.ui.unit. dp
 import androidx. compose.ui.unit.sp
 import androidx.compose.ui. window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example. drunksafe. data.TrustedContact
+import com.example.drunksafe.data.repositories.TrustedContact
 import com. example.drunksafe.viewmodel. TrustedContactsViewModel
-
-private val DarkBlue = Color(0xFF0A1929)
-private val GoldYellow = Color(0xFFD4A84B)
-private val CardBackground = Color(0xFF0D2137)
+import com.example.drunksafe.ui.theme.DarkBlue
+import com.example.drunksafe.ui.theme.GoldYellow
+import com.example.drunksafe.ui.theme.CardBackground
 
 @Composable
 fun TrustedContactsScreen(

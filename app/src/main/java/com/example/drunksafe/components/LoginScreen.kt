@@ -25,10 +25,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.drunksafe.viewmodel.AuthUiState
 import com. example.drunksafe.viewmodel. LoginViewModel
 import com.example.drunksafe.R
-
-private val DarkBackground = Color(0xFF072E3A)
-private val GoldAccent = Color(0xFFD8A84A)
-private val GreenAccent = Color(0xFF7FD08A)
+import com.example.drunksafe.ui.theme.DarkBackground
+import com.example.drunksafe.ui.theme.GoldAccent
+import com.example.drunksafe.ui.theme.GreenAccent
 
 @Composable
 fun LoginScreen(
@@ -75,7 +74,7 @@ fun LoginScreen(
             Image(
                 painter = painterResource(id = R.drawable.drunksafe_logo),
                 contentDescription = "DrunkSafe Logo",
-                modifier = Modifier.size(120.dp)  // Podes ajustar o tamanho
+                modifier = Modifier.size(140.dp)  // Podes ajustar o tamanho
             )
 
             Spacer(Modifier.height(16.dp))

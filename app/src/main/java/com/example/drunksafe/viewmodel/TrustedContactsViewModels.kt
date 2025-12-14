@@ -2,8 +2,8 @@ package com.example. drunksafe.viewmodel
 
 import androidx. lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.drunksafe.data.ContactsRepository
-import com. example.drunksafe.data.TrustedContact
+import com.example.drunksafe.data.repositories.ContactsRepository
+import com.example.drunksafe.data.repositories.TrustedContact
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines. flow.asStateFlow

@@ -1,4 +1,4 @@
-package com.example.drunksafe.data
+package com.example.drunksafe.data.repositories
 
 import com.google.firebase. auth.FirebaseAuth
 import com.google. firebase.firestore. FirebaseFirestore

@@ -24,9 +24,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com. example.drunksafe.viewmodel. AuthUiState
 import com.example. drunksafe. viewmodel.LoginViewModel
 
-private val DarkBackground = Color(0xFF072E3A)
-private val GoldAccent = Color(0xFFD8A84A)
-private val GreenAccent = Color(0xFF7FD08A)
+import com.example.drunksafe.ui.theme.DarkBackground
+import com.example.drunksafe.ui.theme.GoldAccent
+import com.example.drunksafe.ui.theme.GreenAccent
 
 @Composable
 fun SignUpScreen(

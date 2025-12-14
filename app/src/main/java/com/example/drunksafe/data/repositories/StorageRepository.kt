@@ -1,4 +1,4 @@
-package com.example.drunksafe.data
+package com.example.drunksafe.data.repositories
 
 import android.net.Uri
 import com.google.firebase.storage.FirebaseStorage

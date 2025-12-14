@@ -1,6 +1,8 @@
-package com.example.drunksafe.data
+package com.example.drunksafe.data.repositories
 
 import android.util.Log
+import com.example.drunksafe.data.DirectionsResponse
+import com.example.drunksafe.data.services.RetrofitClient
 
 class DirectionsRepository {
 
@@ -14,17 +16,17 @@ class DirectionsRepository {
                 val body = response.body()
 
                 if (body?.status != "OK") {
-                    Log.e("DirectionsRepo", "Erro da Google API: ${body?.status} - ${body?.errorMessage}")
+                    Log.e("DirectionsRepo", "Error Google API: ${body?.status} - ${body?.errorMessage}")
                     return null
                 }
 
                 return body
             } else {
-                Log.e("DirectionsRepo", "Erro HTTP: ${response.code()} - ${response.message()}")
+                Log.e("DirectionsRepo", "Error HTTP: ${response.code()} - ${response.message()}")
                 null
             }
         } catch (e: Exception) {
-            Log.e("DirectionsRepo", "Exceção de Rede: ${e.message}")
+            Log.e("DirectionsRepo", "Network Exception: ${e.message}")
             e.printStackTrace()
             null
         }

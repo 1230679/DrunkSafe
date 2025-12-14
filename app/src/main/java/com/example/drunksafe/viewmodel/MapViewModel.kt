@@ -9,8 +9,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.drunksafe.BuildConfig
-import com.example.drunksafe.data.DirectionsRepository
-import com.example.drunksafe.data.HomeAddressPreferences
+import com.example.drunksafe.data.repositories.DirectionsRepository
+import com.example.drunksafe.data.repositories.HomeAddressPreferences
+import com.example.drunksafe.data.services.LocationService
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.PolyUtil
 import kotlinx.coroutines.Dispatchers
@@ -20,16 +21,26 @@ import java.util.Locale
 
 class MapViewModel(application: Application) : AndroidViewModel(application) {
 
+    // Dependencies
+    private val locationService = LocationService(application.applicationContext)
     private val repository = DirectionsRepository()
-    private val googleApiKey = BuildConfig.MAPS_API_KEY
     private val prefs = HomeAddressPreferences(application.applicationContext)
+    private val googleApiKey = BuildConfig.MAPS_API_KEY
 
+    // --- STATE VARIABLES ---
+
+    // Permission Status
+    var hasLocationPermission by mutableStateOf(false)
+        private set
+
+    // Navigation Status
     var isNavigationMode by mutableStateOf(false)
         private set
 
     var isLoading by mutableStateOf(false)
         private set
 
+    // Route Data
     var routePoints by mutableStateOf<List<LatLng>>(emptyList())
         private set
 
@@ -39,11 +50,20 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
     var displayDuration by mutableStateOf("")
         private set
 
+    // User Data
     var homeLocation by mutableStateOf<LatLng?>(null)
         private set
 
+    // --- INIT ---
+
     init {
         loadHomeLocation()
+    }
+
+    // --- ACTIONS ---
+
+    fun updatePermissionStatus(granted: Boolean) {
+        hasLocationPermission = granted
     }
 
     fun loadHomeLocation() {
@@ -53,73 +73,113 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun searchAndNavigate(query: String, currentLocation: LatLng) {
+    /**
+     * Entry point for the Search Bar.
+     * 1. Gets current location internally.
+     * 2. Geocodes the text query.
+     * 3. Starts navigation.
+     */
+    fun searchAndNavigateToPlace(query: String) {
         if (query.isBlank()) return
 
-        isLoading = true
+        viewModelScope.launch {
+            isLoading = true
 
-        viewModelScope.launch(Dispatchers.IO) {
+            // 1. Get Current Location
+            val currentLocation = locationService.getCurrentLocation()
+            if (currentLocation == null) {
+                showToast("Unable to get current location. Check GPS.")
+                isLoading = false
+                return@launch
+            }
+
+            // 2. Search for the address (Geocoding)
             try {
-                val geocoder = Geocoder(getApplication(), Locale.getDefault())
-                val results = geocoder.getFromLocationName(query, 1)
-
-                if (!results.isNullOrEmpty()) {
-                    val location = results[0]
-                    val destinationLatLng = LatLng(location.latitude, location.longitude)
-
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(getApplication(), "Going to: ${location.featureName ?: query}", Toast.LENGTH_SHORT).show()
-                        startNavigation(currentLocation, customDestination = destinationLatLng)
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(getApplication(), "Location not found.", Toast.LENGTH_SHORT).show()
-                        isLoading = false
+                // Move Geocoding to IO thread
+                val destinationLatLng = withContext(Dispatchers.IO) {
+                    val geocoder = Geocoder(getApplication(), Locale.getDefault())
+                    val results = geocoder.getFromLocationName(query, 1)
+                    if (!results.isNullOrEmpty()) {
+                        LatLng(results[0].latitude, results[0].longitude)
+                    } else {
+                        null
                     }
                 }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(getApplication(), "Search error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+
+                // 3. Handle Result
+                if (destinationLatLng != null) {
+                    calculateRoute(currentLocation, destinationLatLng)
+                } else {
+                    showToast("Location not found.")
                     isLoading = false
                 }
+
+            } catch (e: Exception) {
+                showToast("Search error: ${e.localizedMessage}")
+                isLoading = false
             }
         }
     }
 
-    fun startNavigation(currentLocation: LatLng, customDestination: LatLng? = null) {
+    /**
+     * Entry point for "Take Me Home" button.
+     */
+    fun startNavigationToHome() {
         viewModelScope.launch {
-            val targetDestination = customDestination ?: prefs.getHomeLatLng()
+            val targetHome = prefs.getHomeLatLng()
 
-            if (targetDestination == null) {
-                Toast.makeText(getApplication(), "Define your home address first on your profile!", Toast.LENGTH_LONG).show()
+            if (targetHome == null) {
+                showToast("Define your home address first on your profile!")
                 return@launch
-            }
-
-            if (customDestination == null) {
-                homeLocation = targetDestination
-            } else {
-                homeLocation = targetDestination
             }
 
             isLoading = true
 
-            val originString = String.format(Locale.US, "%.6f,%.6f", currentLocation.latitude, currentLocation.longitude)
-            val destString = String.format(Locale.US, "%.6f,%.6f", targetDestination.latitude, targetDestination.longitude)
+            // Get Current Location
+            val currentLocation = locationService.getCurrentLocation()
+            if (currentLocation == null) {
+                showToast("Unable to get current location. Check GPS.")
+                isLoading = false
+                return@launch
+            }
 
+            // Start Navigation
+            calculateRoute(currentLocation, targetHome)
+        }
+    }
+
+    /**
+     * Internal logic to calculate the route API request.
+     */
+    private suspend fun calculateRoute(origin: LatLng, destination: LatLng) {
+        homeLocation = destination
+
+        val originString = String.format(Locale.US, "%.6f,%.6f", origin.latitude, origin.longitude)
+        val destString = String.format(Locale.US, "%.6f,%.6f", destination.latitude, destination.longitude)
+
+        try {
+            // Fetch Route from Repository
             val response = repository.getRoute(originString, destString, googleApiKey)
 
             if (response != null && response.routes.isNotEmpty()) {
                 val route = response.routes[0]
+
+                // Decode Polyline
                 routePoints = PolyUtil.decode(route.overviewPolyline.points)
 
+                // Update Distance/Duration
                 if (route.legs.isNotEmpty()) {
                     displayDistance = route.legs[0].distance.text
                     displayDuration = route.legs[0].duration.text
                 }
+
                 isNavigationMode = true
             } else {
-                Toast.makeText(getApplication(), "There's no way to walk to the address.", Toast.LENGTH_SHORT).show()
+                showToast("No walking route found.")
             }
+        } catch (e: Exception) {
+            showToast("Network error: ${e.localizedMessage}")
+        } finally {
             isLoading = false
         }
     }
@@ -129,5 +189,10 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         routePoints = emptyList()
         displayDistance = ""
         displayDuration = ""
+        loadHomeLocation()
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(getApplication(), message, Toast.LENGTH_SHORT).show()
     }
 }

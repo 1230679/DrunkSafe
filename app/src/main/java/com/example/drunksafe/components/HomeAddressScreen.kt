@@ -2,7 +2,6 @@ package com.example.drunksafe.ui
 
 import android.location.Geocoder
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -17,17 +16,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.drunksafe.data.HomeAddressPreferences
+import com.example.drunksafe.data.repositories.HomeAddressPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
-
-// --- Cores (Igual ao Profile) ---
-private val BackgroundDark = Color(0xFF001524)
-private val GoldYellow = Color(0xFFE0AA4E)
-private val GreenArrow = Color(0xFF4CAF50)
-private val White = Color(0xFFFFFFFF)
+import com.example.drunksafe.ui.theme.BackgroundDark
+import com.example.drunksafe.ui.theme.GoldYellow
+import com.example.drunksafe.ui.theme.GreenArrow
+import com.example.drunksafe.ui.theme.White
 
 @Composable
 fun HomeAddressScreen(

@@ -1,5 +1,6 @@
-package com.example.drunksafe.data
+package com.example.drunksafe.data.services
 
+import com.example.drunksafe.data.DirectionsResponse
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

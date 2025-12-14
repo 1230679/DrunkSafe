@@ -1,32 +1,61 @@
-package com.example. drunksafe. ui
+package com.example.drunksafe.components
 
-import androidx.compose. foundation.clickable
-import androidx. compose.foundation.layout.*
-import androidx. compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose. foundation.text.KeyboardOptions
-import androidx.compose.foundation. verticalScroll
-import androidx.compose.material.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose. material.icons.filled.ArrowDropDown
-import androidx. compose.material.icons.filled.Check
-import androidx.compose.material.icons. filled.Close
-import androidx.compose.material.icons. filled.Home
-import androidx.compose.material.icons. filled.Person
-import androidx.compose.material.icons. filled.Phone
-import androidx.compose.runtime.*
-import androidx. compose.ui.Alignment
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose. ui.text.font.FontWeight
-import androidx.compose.ui.text. input.KeyboardType
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui. unit.sp
-
-private val DarkBackground = Color(0xFF072E3A)
-private val GoldAccent = Color(0xFFD8A84A)
-private val GreenAccent = Color(0xFF7FD08A)
-private val CardBackground = Color(0xFF0D2137)
+import androidx.compose.ui.unit.sp
+import kotlin.code
+import kotlin.collections.get
+import com.example.drunksafe.ui.theme.DarkBackground
+import com.example.drunksafe.ui.theme.GoldAccent
+import com.example.drunksafe.ui.theme.GreenAccent
+import com.example.drunksafe.ui.theme.CardBackground
 
 // Data class for country codes
 data class CountryCode(
@@ -84,11 +113,11 @@ fun SetupScreen(
         AlertDialog(
             onDismissRequest = { showSkipDialog = false },
             backgroundColor = CardBackground,
-            title = { Text("Skip Setup? ", color = Color. White) },
+            title = { Text("Skip Setup? ", color = Color.Companion.White) },
             text = {
                 Text(
                     "You can set up your emergency contact later in the app.  Are you sure you want to skip for now?",
-                    color = Color. Gray
+                    color = Color.Companion.Gray
                 )
             },
             confirmButton = {
@@ -110,47 +139,47 @@ fun SetupScreen(
         )
     }
 
-    Surface(modifier = Modifier.fillMaxSize(), color = DarkBackground) {
+    Surface(modifier = Modifier.Companion.fillMaxSize(), color = DarkBackground) {
         Column(
-            modifier = Modifier
-                . fillMaxSize()
+            modifier = Modifier.Companion
+                .fillMaxSize()
                 .padding(24.dp)
                 .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.Companion.CenterHorizontally
         ) {
             // X button at top right
             Row(
-                modifier = Modifier. fillMaxWidth(),
+                modifier = Modifier.Companion.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
                 IconButton(onClick = { showSkipDialog = true }) {
                     Icon(
-                        Icons. Default.Close,
+                        Icons.Default.Close,
                         contentDescription = "Skip Setup",
-                        tint = Color.Gray
+                        tint = Color.Companion.Gray
                     )
                 }
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.Companion.height(8.dp))
 
             // Title
             Text(
                 "Welcome to DrunkSafe! ",
                 color = GreenAccent,
                 fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Companion.Bold
             )
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.Companion.height(8.dp))
 
             Text(
                 "Let's set up your emergency contact",
-                color = Color.Gray,
+                color = Color.Companion.Gray,
                 fontSize = 14.sp
             )
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.Companion.height(32.dp))
 
             // Single Emergency Contact Card
             ContactInputCard(
@@ -160,43 +189,48 @@ fun SetupScreen(
                 }
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.Companion.height(24.dp))
 
             // Home Address
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.Companion.fillMaxWidth(),
                 backgroundColor = CardBackground,
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.Companion.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.Companion.CenterVertically) {
                         Icon(
                             Icons.Default.Home,
                             contentDescription = null,
                             tint = GoldAccent,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.Companion.size(24.dp)
                         )
-                        Spacer(Modifier.width(8.dp))
+                        Spacer(Modifier.Companion.width(8.dp))
                         Text(
                             "Your Home Address",
-                            color = Color.White,
-                            fontWeight = FontWeight. Bold
+                            color = Color.Companion.White,
+                            fontWeight = FontWeight.Companion.Bold
                         )
                     }
 
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.Companion.height(12.dp))
 
                     OutlinedTextField(
                         value = address,
                         onValueChange = { address = it },
-                        label = { Text("Full Address", color = Color.Gray) },
-                        placeholder = { Text("Street, City, Postal Code", color = Color.Gray) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp),
+                        label = { Text("Full Address", color = Color.Companion.Gray) },
+                        placeholder = {
+                            Text(
+                                "Street, City, Postal Code",
+                                color = Color.Companion.Gray
+                            )
+                        },
+                        modifier = Modifier.Companion.fillMaxWidth(),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            textColor = Color.White,
+                            textColor = Color.Companion.White,
                             focusedBorderColor = GoldAccent,
-                            unfocusedBorderColor = Color.Gray,
+                            unfocusedBorderColor = Color.Companion.Gray,
                             cursorColor = GoldAccent
                         ),
                         maxLines = 3
@@ -204,20 +238,21 @@ fun SetupScreen(
                 }
             }
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.Companion.height(32.dp))
 
             // Complete Setup Button
             Button(
                 onClick = {
-                    val contactToSave = if (contact.name. isNotBlank() && contact.phone.isNotBlank()) {
-                        // Combine country code with phone number
-                        contact.copy(phone = "${contact.countryCode.code}${contact.phone}")
-                    } else {
-                        null
-                    }
+                    val contactToSave =
+                        if (contact.name.isNotBlank() && contact.phone.isNotBlank()) {
+                            // Combine country code with phone number
+                            contact.copy(phone = "${contact.countryCode.code}${contact.phone}")
+                        } else {
+                            null
+                        }
                     onSetupComplete(contactToSave, address)
                 },
-                modifier = Modifier
+                modifier = Modifier.Companion
                     .fillMaxWidth()
                     .height(56.dp),
                 enabled = isFormValid,
@@ -225,23 +260,23 @@ fun SetupScreen(
                     backgroundColor = GreenAccent,
                     disabledBackgroundColor = GreenAccent.copy(alpha = 0.5f)
                 ),
-                shape = RoundedCornerShape(12.dp)
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
             ) {
                 Icon(
                     Icons.Default.Check,
                     contentDescription = null,
                     tint = DarkBackground
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.Companion.width(8.dp))
                 Text(
                     "Complete Setup",
                     color = DarkBackground,
-                    fontWeight = FontWeight. Bold,
+                    fontWeight = FontWeight.Companion.Bold,
                     fontSize = 16.sp
                 )
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.Companion.height(16.dp))
 
             // Skip text button
             TextButton(onClick = { showSkipDialog = true }) {
@@ -252,15 +287,15 @@ fun SetupScreen(
                 )
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.Companion.height(8.dp))
 
             Text(
                 "You can add more contacts later in Settings",
-                color = Color.Gray,
+                color = Color.Companion.Gray,
                 fontSize = 12.sp
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.Companion.height(24.dp))
         }
     }
 }
@@ -273,105 +308,105 @@ fun ContactInputCard(
     var showCountryDropdown by remember { mutableStateOf(false) }
 
     Card(
-        modifier = Modifier. fillMaxWidth(),
+        modifier = Modifier.Companion.fillMaxWidth(),
         backgroundColor = CardBackground,
-        shape = RoundedCornerShape(12.dp)
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(modifier = Modifier.Companion.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.Companion.CenterVertically) {
                 Icon(
                     Icons.Default.Person,
                     contentDescription = null,
                     tint = GoldAccent,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.Companion.size(24.dp)
                 )
-                Spacer(Modifier.width(8. dp))
+                Spacer(Modifier.Companion.width(8.dp))
                 Text(
                     "Emergency Contact",
-                    color = Color. White,
-                    fontWeight = FontWeight.Bold
+                    color = Color.Companion.White,
+                    fontWeight = FontWeight.Companion.Bold
                 )
 
                 // Filled indicator
-                if (contact.name. isNotBlank() && contact.phone. isNotBlank()) {
-                    Spacer(Modifier.weight(1f))
+                if (contact.name.isNotBlank() && contact.phone.isNotBlank()) {
+                    Spacer(Modifier.Companion.weight(1f))
                     Icon(
                         Icons.Default.Check,
                         contentDescription = "Complete",
                         tint = GreenAccent,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.Companion.size(20.dp)
                     )
                 }
             }
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.Companion.height(12.dp))
 
             // Name
             OutlinedTextField(
                 value = contact.name,
-                onValueChange = { onContactChange(contact. copy(name = it)) },
-                label = { Text("Name", color = Color. Gray) },
-                placeholder = { Text("Contact name", color = Color.Gray) },
+                onValueChange = { onContactChange(contact.copy(name = it)) },
+                label = { Text("Name", color = Color.Companion.Gray) },
+                placeholder = { Text("Contact name", color = Color.Companion.Gray) },
                 leadingIcon = {
-                    Icon(Icons.Default.Person, null, tint = Color. Gray)
+                    Icon(Icons.Default.Person, null, tint = Color.Companion.Gray)
                 },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(8.dp),
-                colors = TextFieldDefaults. outlinedTextFieldColors(
-                    textColor = Color. White,
+                modifier = Modifier.Companion.fillMaxWidth(),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    textColor = Color.Companion.White,
                     focusedBorderColor = GoldAccent,
-                    unfocusedBorderColor = Color. Gray,
+                    unfocusedBorderColor = Color.Companion.Gray,
                     cursorColor = GoldAccent
                 ),
                 singleLine = true
             )
 
-            Spacer(Modifier. height(8.dp))
+            Spacer(Modifier.Companion.height(8.dp))
 
             // Phone with Country Code Selector
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.Companion.fillMaxWidth(),
+                verticalAlignment = Alignment.Companion.CenterVertically
             ) {
                 // Country Code Dropdown
                 Box {
                     OutlinedButton(
                         onClick = { showCountryDropdown = true },
-                        modifier = Modifier
+                        modifier = Modifier.Companion
                             .width(120.dp)
                             .height(56.dp),
-                        shape = RoundedCornerShape(8. dp),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            backgroundColor = Color. Transparent,
-                            contentColor = Color.White
+                            backgroundColor = Color.Companion.Transparent,
+                            contentColor = Color.Companion.White
                         ),
-                        border = ButtonDefaults.outlinedBorder. copy(
-                            brush = androidx.compose.ui. graphics.SolidColor(Color.Gray)
+                        border = ButtonDefaults.outlinedBorder.copy(
+                            brush = SolidColor(Color.Companion.Gray)
                         )
                     ) {
                         Text(
                             text = "${contact.countryCode.flag} ${contact.countryCode.code}",
-                            color = Color.White,
+                            color = Color.Companion.White,
                             fontSize = 14.sp
                         )
                         Icon(
                             Icons.Default.ArrowDropDown,
                             contentDescription = "Select country",
-                            tint = Color.Gray
+                            tint = Color.Companion.Gray
                         )
                     }
 
                     DropdownMenu(
                         expanded = showCountryDropdown,
                         onDismissRequest = { showCountryDropdown = false },
-                        modifier = Modifier
+                        modifier = Modifier.Companion
                             .width(250.dp)
                             .heightIn(max = 300.dp)
                     ) {
                         countryCodes.forEach { countryCode ->
                             DropdownMenuItem(
                                 onClick = {
-                                    onContactChange(contact. copy(countryCode = countryCode))
+                                    onContactChange(contact.copy(countryCode = countryCode))
                                     showCountryDropdown = false
                                 }
                             ) {
@@ -384,28 +419,28 @@ fun ContactInputCard(
                     }
                 }
 
-                Spacer(Modifier.width(8. dp))
+                Spacer(Modifier.Companion.width(8.dp))
 
                 // Phone Number Field (numbers only)
                 OutlinedTextField(
                     value = contact.phone,
                     onValueChange = { newValue ->
                         // Only allow digits
-                        val digitsOnly = newValue.filter { it. isDigit() }
-                        onContactChange(contact. copy(phone = digitsOnly))
+                        val digitsOnly = newValue.filter { it.isDigit() }
+                        onContactChange(contact.copy(phone = digitsOnly))
                     },
-                    label = { Text("Phone", color = Color.Gray) },
-                    placeholder = { Text("912345678", color = Color.Gray) },
+                    label = { Text("Phone", color = Color.Companion.Gray) },
+                    placeholder = { Text("912345678", color = Color.Companion.Gray) },
                     leadingIcon = {
-                        Icon(Icons.Default.Phone, null, tint = Color. Gray)
+                        Icon(Icons.Default.Phone, null, tint = Color.Companion.Gray)
                     },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType. Number),
+                    modifier = Modifier.Companion.weight(1f),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Companion.Number),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        textColor = Color.White,
+                        textColor = Color.Companion.White,
                         focusedBorderColor = GoldAccent,
-                        unfocusedBorderColor = Color.Gray,
+                        unfocusedBorderColor = Color.Companion.Gray,
                         cursorColor = GoldAccent
                     ),
                     singleLine = true

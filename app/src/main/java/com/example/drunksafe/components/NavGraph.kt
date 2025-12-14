@@ -12,20 +12,24 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx. navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
+import com.example.drunksafe.components.GoogleMapsCheckDialog
+import com.example.drunksafe.components.SetupScreen
 import com.example.drunksafe.viewmodel.LoginViewModel
 import com. example.drunksafe.viewmodel. SetupState
 import com.example.drunksafe.viewmodel.SetupViewModel
 import com.example.drunksafe.viewmodel.TrustedContactsViewModel
-import com.example.drunksafe.ui.MapHomeScreen
 
-private val DarkBackground = Color(0xFF072E3A)
-private val GoldAccent = Color(0xFFD8A84A)
+import com.example.drunksafe.ui.theme.DarkBackground
+import com.example.drunksafe.ui.theme.GoldAccent
 
 @Composable
 fun AppNavHost(onLoggedIn: (String) -> Unit) {
     val navController = rememberNavController()
     val loginViewModel: LoginViewModel = viewModel()
     val setupViewModel: SetupViewModel = viewModel()
+
+    //Check if the user has google maps installed
+    GoogleMapsCheckDialog()
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
@@ -64,7 +68,7 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             LaunchedEffect(state) {
                 when (state) {
                     is SetupState.SetupComplete -> {
-                        navController.navigate("home") {
+                        navController.navigate("dashboard") {
                             popUpTo("checkSetup") { inclusive = true }
                         }
                     }
@@ -92,11 +96,12 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             SetupScreen(
                 onSetupComplete = { contact, address ->
                     // contact is now a single EmergencyContactInput (or null)
-                    val contactPairs = if (contact != null && contact.name.isNotBlank() && contact.phone.isNotBlank()) {
-                        listOf(contact. name to contact.phone)
-                    } else {
-                        emptyList()
-                    }
+                    val contactPairs =
+                        if (contact != null && contact.name.isNotBlank() && contact.phone.isNotBlank()) {
+                            listOf(contact.name to contact.phone)
+                        } else {
+                            emptyList()
+                        }
                     setupViewModel.completeSetup(contactPairs, address)
                     navController.navigate("dashboard") {
                         popUpTo("setup") { inclusive = true }
@@ -105,7 +110,7 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                 onSkipSetup = {
                     // Apenas navega para home sem guardar nada
                     // O utilizador pode fazer o setup mais tarde
-                    navController.navigate("home") {
+                    navController.navigate("dashboard") {
                         popUpTo("setup") { inclusive = true }
                     }
                 }
@@ -114,9 +119,6 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
 
     composable("dashboard") {
         MapHomeScreen(
-            onTakeMeHomeClick = {
-                navController.navigate("route_in_progress")
-            },
             onEmergencyAlertClick = {
                 navController.navigate("emergency")
             },
@@ -126,9 +128,6 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             onProfileClick = {
                 navController.navigate("profile")
             },
-            onSearch = { query ->
-                println("O utilizador pesquisou por: $query")
-            }
         )
     }
 
@@ -140,8 +139,6 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                 viewModel = contactsViewModel
             )
         }
-
-        composable("navigation") { NavigationScreen() }
 
         composable("emergency") {
             val contactsViewModel: TrustedContactsViewModel = viewModel()
