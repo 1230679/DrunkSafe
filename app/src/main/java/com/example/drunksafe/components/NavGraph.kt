@@ -2,7 +2,7 @@ package com.example. drunksafe.ui
 
 import androidx.compose. foundation.layout. Box
 import androidx.compose.foundation.layout. fillMaxSize
-import androidx.compose.material. CircularProgressIndicator
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose. material.Surface
 import androidx.compose.runtime.*
 import androidx. compose.ui. Alignment
@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
 import com.example.drunksafe.components.GoogleMapsCheckDialog
 import com.example.drunksafe.ui.SignUpScreen
+import com.example.drunksafe.data.ThemeMode
 import com.example.drunksafe.viewmodel.LoginViewModel
 import com. example.drunksafe.viewmodel. SetupState
 import com.example.drunksafe.viewmodel.SetupViewModel
@@ -39,7 +40,10 @@ import com.example.drunksafe.ui.theme.GoldAccent
  */
 
 @Composable
-fun AppNavHost(onLoggedIn: (String) -> Unit) {
+fun AppNavHost(
+    onLoggedIn: (String) -> Unit,
+    onThemeChanged: (ThemeMode) -> Unit
+) {
     val navController = rememberNavController()
     val loginViewModel: LoginViewModel = viewModel()
     val setupViewModel: SetupViewModel = viewModel()
@@ -75,9 +79,28 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
 
         composable("checkSetup") {
             val state by setupViewModel.state. collectAsState()
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val prefs = remember { com.example.drunksafe.data.HomeAddressPreferences(context) }
+            val userRepo = remember { com.example.drunksafe.data.UserRepository() }
+            val auth = remember { com.google.firebase.auth.FirebaseAuth.getInstance() }
+
 
             LaunchedEffect(Unit) {
                 setupViewModel.checkIfSetupNeeded()
+            }
+
+            LaunchedEffect(Unit) {
+                val uid = auth.currentUser?.uid ?: return@LaunchedEffect
+
+                val profile = userRepo.getUserProfile(uid) ?: return@LaunchedEffect
+                val address = profile.homeAddress
+
+                val lat = profile.homeLat
+                val lng = profile.homeLng
+
+                if (!address.isNullOrBlank() && lat != null && lng != null) {
+                    prefs.saveHomeAddress(address = address, lat = lat, lng = lng)
+                }
             }
 
             LaunchedEffect(state) {
@@ -96,6 +119,7 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                 }
             }
 
+            // Loading enquanto verifica
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = DarkBackground
@@ -111,6 +135,7 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                 onSetupComplete = { contacts, address ->
                     val contactPairs = contacts.map { it.name to it.phone }
                     setupViewModel.completeSetup(contactPairs, address)
+
                     navController.navigate("dashboard") {
                         popUpTo("setup") { inclusive = true }
                     }
@@ -125,21 +150,22 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             )
         }
 
-        // --- Main Application Flow ---
-
         composable("dashboard") {
-            MapHomeScreen(
-                onEmergencyAlertClick = {
-                    navController.navigate("emergency")
-                },
-                onCallTrustedContactsClick = {
-                    navController.navigate("trustedContacts")
-                },
-                onProfileClick = {
-                    navController.navigate("profile")
-                },
-            )
-        }
+        MapHomeScreen(
+            onTakeMeHomeClick = {
+                navController.navigate("route_in_progress")
+            },
+            onEmergencyAlertClick = {
+                navController.navigate("emergency")
+            },
+            onCallTrustedContactsClick = {
+                navController.navigate("trustedContacts")
+            },
+            onSettingsClick = {
+                navController.navigate("settings")
+            }
+        )
+    }
 
 
         composable("trustedContacts") {
@@ -158,30 +184,35 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
             )
         }
 
-        composable("profile") {
-            ProfileScreen(
+        composable("settings") {
+            SettingsScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onLogout = {
                     loginViewModel.signOut()
                     navController.navigate("login") { popUpTo(0) { inclusive = true } }
                 },
 
-                onProfileClick = {
-                    // Futuramente: navController.navigate("edit_profile")
-                    println("Clicou em Profile")
+                onOpenProfile = {
+                    navController.navigate("profile")
                 },
                 onAddressClick = {
                    navController.navigate("edit_address")
                 },
                 onThemeClick = {
-                    println("Clicou em Theme")
+                    navController.navigate("theme")
                 },
                 onTermsClick = {
-                    println("Clicou em Terms")
+                    navController.navigate("terms")
                 },
                 onTestEmergencyClick = {
                     navController.navigate("emergency")
                 }
+            )
+        }
+
+        composable("profile") {
+            ProfileScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 
@@ -191,6 +222,19 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                     navController.popBackStack()
                 }
             )
+        }
+
+        composable("theme") {
+            ThemeScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onThemeChanged = { mode ->
+                    onThemeChanged(mode)
+                }
+            )
+        }
+
+        composable("terms") {
+            TermsPrivacyScreen(onNavigateBack = { navController.popBackStack() })
         }
     }
 }

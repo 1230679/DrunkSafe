@@ -11,7 +11,12 @@ data class UserProfile(
     val email: String = "",
     val displayName: String = "",
     val homeAddress: String = "",
-    val setupCompleted: Boolean = false
+    val homeLat: Double? = null,
+    val homeLng: Double? = null,
+    val setupCompleted: Boolean = false,
+    val dateOfBirth: String = "",
+    val phoneCountryCode: String = "+351",
+    val phoneNumber: String = ""
 )
 
 class UserRepository(
@@ -30,6 +35,22 @@ class UserRepository(
         } catch (e: Exception) {
             null
         }
+    }
+
+    suspend fun updateHomeAddress(
+        uid: String,
+        address: String,
+        lat: Double,
+        lng: Double
+    ) {
+        usersCollection.document(uid).set(
+            mapOf(
+                "homeAddress" to address,
+                "homeLat" to lat,
+                "homeLng" to lng
+            ),
+            SetOptions.merge()
+        ).await()
     }
 
     suspend fun isSetupCompleted(uid: String): Boolean {

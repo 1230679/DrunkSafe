@@ -45,11 +45,16 @@ class LoginViewModel(
                 if (user != null) {
                     // Criar perfil com setupCompleted = false
                     val profile = UserProfile(
-                        uid = user. uid,
+                        uid = user.uid,
                         email = user.email ?: "",
                         displayName = displayName,
                         homeAddress = "",
-                        setupCompleted = false  // ← Explicitamente false para novos utilizadores
+                        homeLat = null,
+                        homeLng = null,
+                        setupCompleted = false,
+                        dateOfBirth = "",
+                        phoneCountryCode = "+351",
+                        phoneNumber = ""
                     )
                     userRepo.saveUserProfile(profile)
                     _uiState.value = AuthUiState.Success(user. uid)

@@ -48,7 +48,7 @@ fun TrustedContactsScreen(
     onNavigateBack: () -> Unit = {},
     viewModel: TrustedContactsViewModel = viewModel()
 ) {
-    val uiState by viewModel. uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     var showNotifyDialog by remember { mutableStateOf(false) }
     var showMessageDialog by remember { mutableStateOf(false) }

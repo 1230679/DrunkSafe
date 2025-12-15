@@ -50,7 +50,7 @@ fun EmergencyScreen(
     contactsViewModel: TrustedContactsViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val uiState by contactsViewModel.uiState. collectAsState()
+    val uiState by contactsViewModel.uiState.collectAsState()
 
     var tapCount by remember { mutableStateOf(0) }
     var isAlertTriggered by remember { mutableStateOf(false) }
@@ -69,7 +69,7 @@ fun EmergencyScreen(
         isAlertTriggered = true
         showConfirmation = true
 
-        val contacts = uiState. contacts
+        val contacts = uiState.contacts
         val message = "🆘 EMERGENCY ALERT! I need help urgently.  Please try to contact me or call emergency services.  - Sent via DrunkSafe"
 
         // Build SMS URI with all phone numbers
@@ -227,7 +227,7 @@ fun EmergencyScreen(
     // Confirmation Dialog
     if (showConfirmation) {
         AlertConfirmationDialog(
-            contactCount = uiState. contacts.size,
+            contactCount = uiState.contacts.size,
             onDismiss = {
                 showConfirmation = false
                 tapCount = 0

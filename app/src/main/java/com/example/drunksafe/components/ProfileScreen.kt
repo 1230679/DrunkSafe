@@ -1,18 +1,23 @@
 package com.example.drunksafe.ui
 
+import android.app.DatePickerDialog
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.drunksafe.ui.components.PhoneNumberInputRow
+import com.example.drunksafe.ui.components.countryCodes
+import com.example.drunksafe.viewmodel.ProfileViewModel
+import java.util.Calendar
 
 import com.example.drunksafe.ui.theme.BackgroundDark
 import com.example.drunksafe.ui.theme.ItemBlue
@@ -23,166 +28,163 @@ import com.example.drunksafe.ui.theme.GreenArrow
 @Composable
 fun ProfileScreen(
     onNavigateBack: () -> Unit,
-    onLogout: () -> Unit,
-    onProfileClick: () -> Unit,
-    onAddressClick: () -> Unit,
-    onThemeClick: () -> Unit,
-    onTermsClick: () -> Unit,
-    onTestEmergencyClick: () -> Unit
+    viewModel: ProfileViewModel = viewModel()
 ) {
-    var showLogoutDialog by remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsState()
+    var isEditing by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+
+    fun openDatePicker(current: String) {
+        val cal = Calendar.getInstance()
+        val parts = current.split("-")
+        if (parts.size == 3) {
+            parts[0].toIntOrNull()?.let { cal.set(Calendar.YEAR, it) }
+            parts[1].toIntOrNull()?.let { cal.set(Calendar.MONTH, it - 1) }
+            parts[2].toIntOrNull()?.let { cal.set(Calendar.DAY_OF_MONTH, it) }
+        }
+
+        DatePickerDialog(
+            context,
+            { _, year, month, day ->
+                val yyyy = year.toString().padStart(4, '0')
+                val mm = (month + 1).toString().padStart(2, '0')
+                val dd = day.toString().padStart(2, '0')
+                viewModel.onDateOfBirthChange("$yyyy-$mm-$dd")
+            },
+            cal.get(Calendar.YEAR),
+            cal.get(Calendar.MONTH),
+            cal.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "Settings",
-                            color = Color.White,
-                            fontSize = 26.sp,
-                            modifier = Modifier.padding(end = 48.dp)
-                        )
-                    }
-                },
+                backgroundColor = BackgroundDark,
+                elevation = 0.dp,
+                title = { Text("Profile", color = Color.White, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = GreenArrow)
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Green)
                     }
                 },
-                backgroundColor = BackgroundDark,
-                elevation = 0.dp
+                actions = {
+                    IconButton(onClick = { isEditing = !isEditing; viewModel.clearMessages() }) {
+                        Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Gold)
+                    }
+                }
             )
         },
         backgroundColor = BackgroundDark
-    ) { paddingValues ->
-
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp, vertical = 16.dp)
+                .padding(padding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            Card(backgroundColor = CardBlue, modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
-            // Botão Profile
-            SettingsButton(
-                text = "Profile",
-                backgroundColor = ItemBlue,
-                onClick = onProfileClick
-            )
+                    Text("Name", color = Color.Gray)
+                    OutlinedTextField(
+                        value = uiState.displayName,
+                        onValueChange = viewModel::onDisplayNameChange,
+                        enabled = isEditing,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            textColor = Color.White,
+                            focusedBorderColor = Gold,
+                            unfocusedBorderColor = Color.Gray,
+                            disabledTextColor = Color.White,
+                            disabledBorderColor = Color.DarkGray,
+                            cursorColor = Gold
+                        ),
+                        singleLine = true
+                    )
 
-            Spacer(modifier = Modifier.height(12.dp))
+                    Text("Phone number", color = Color.Gray)
 
-            // Botão Home Address
-            SettingsButton(
-                text = "Home Address",
-                backgroundColor = ItemBlue,
-                onClick = onAddressClick
-            )
+                    if (!isEditing) {
+                        OutlinedTextField(
+                            value = if (uiState.phoneNumber.isBlank())
+                                "Not set"
+                            else
+                                "${uiState.phoneCountryCode} ${uiState.phoneNumber}",
+                            onValueChange = {},
+                            enabled = false,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                textColor = Color.White,
+                                disabledTextColor = Color.White,
+                                disabledBorderColor = Color.DarkGray
+                            ),
+                            singleLine = true
+                        )
+                    } else {
+                        val selectedCountry =
+                            countryCodes.firstOrNull { it.code == uiState.phoneCountryCode }
+                                ?: countryCodes[0]
 
-            Spacer(modifier = Modifier.height(12.dp))
+                        PhoneNumberInputRow(
+                            enabled = true,
+                            selectedCountry = selectedCountry,
+                            phoneNumber = uiState.phoneNumber,
+                            onCountrySelected = { viewModel.onPhoneCountryCodeChange(it.code) },
+                            onPhoneNumberChanged = { viewModel.onPhoneNumberChange(it) },
+                            borderColor = Color.Gray,
+                            focusedBorderColor = Gold,
+                            textColor = Color.White,
+                            placeholderColor = Color.Gray,
+                            cursorColor = Gold
+                        )
+                    }
 
-            // Botão Theme
-            SettingsButton(
-                text = "Theme",
-                backgroundColor = ItemBlue,
-                onClick = onThemeClick
-            )
 
-            Spacer(modifier = Modifier.height(12.dp))
+                    Text("Date of birth", color = Color.Gray)
+                    OutlinedTextField(
+                        value = uiState.dateOfBirth.ifBlank { "Not set" },
+                        onValueChange = {},
+                        enabled = false,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            textColor = Color.White,
+                            disabledTextColor = Color.White,
+                            disabledBorderColor = Color.DarkGray
+                        ),
+                        singleLine = true
+                    )
 
-            // Botão Test Emergency
-            SettingsButton(
-                text = "Test Emergency Button",
-                backgroundColor = AlertRed,
-                onClick = onTestEmergencyClick,
-                showArrow = false
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Botão Terms
-            SettingsButton(
-                text = "Terms & Policy",
-                backgroundColor = ItemBlue,
-                onClick = onTermsClick
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // 3. BOTÃO LOGOUT
-            Button(
-                onClick = { showLogoutDialog = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
-                    .padding(bottom = 16.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = GoldYellow),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Text(
-                    text = "LOGOUT",
-                    color = Color.White,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Black,
-                    letterSpacing = 2.sp
-                )
+                    if (isEditing) {
+                        Button(
+                            onClick = { openDatePicker(uiState.dateOfBirth) },
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Gold),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Edit date of birth", color = BackgroundDark, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
             }
-        }
-    }
 
-    if (showLogoutDialog) {
-        AlertDialog(
-            onDismissRequest = { showLogoutDialog = false },
-            backgroundColor = ItemBlue,
-            title = { Text("Logout", color = Color.White) },
-            text = { Text("Are you sure you want to logout?", color = Color.Gray) },
-            confirmButton = {
-                Button(
-                    onClick = { showLogoutDialog = false; onLogout() },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = GoldYellow)
-                ) { Text("Logout", color = Color.White) }
-            },
-            dismissButton = {
-                TextButton(onClick = { showLogoutDialog = false }) { Text("Cancel", color = GoldYellow) }
-            }
-        )
-    }
-}
+            uiState.errorMessage?.let { Text(it, color = Color.Red) }
+            uiState.successMessage?.let { Text(it, color = Color(0xFF7FD08A)) }
 
-@Composable
-fun SettingsButton(
-    text: String,
-    backgroundColor: Color,
-    onClick: () -> Unit,
-    showArrow: Boolean = true
-) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp),
-        colors = ButtonDefaults.buttonColors(backgroundColor = backgroundColor),
-        shape = RoundedCornerShape(8.dp),
-        elevation = ButtonDefaults.elevation(0.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = text,
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Normal
-            )
-            if (showArrow) {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowRight,
-                    contentDescription = null,
-                    tint = Color.White
-                )
+            if (isEditing) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    OutlinedButton(
+                        onClick = { isEditing = false; viewModel.loadProfile() },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("Cancel", color = Gold) }
+
+                    Button(
+                        onClick = { viewModel.saveProfile(); isEditing = false },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Gold)
+                    ) { Text("Save", color = BackgroundDark, fontWeight = FontWeight.Bold) }
+                }
             }
         }
     }
