@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +32,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.drunksafe.R
 import com.example.drunksafe.viewmodel.MapViewModel
@@ -69,6 +72,8 @@ fun MapHomeScreen(
 ) {
     val context = LocalContext.current
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     // Permission Launcher: Handles the result of the system permission dialog
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -77,14 +82,29 @@ fun MapHomeScreen(
         }
     )
 
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                val isGranted = ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+
+                viewModel.updatePermissionStatus(isGranted)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     // Initial Permission Check: Runs once when the screen loads
     LaunchedEffect(Unit) {
         val isGranted = ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
-
-        viewModel.updatePermissionStatus(isGranted)
 
         if (!isGranted) {
             permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -97,7 +117,8 @@ fun MapHomeScreen(
         GoogleMapBackground(
             isRouteActive = viewModel.isNavigationMode,
             routePoints = viewModel.routePoints,
-            homeLocation = viewModel.homeLocation ?: LatLng(56.1572, 10.2107) // Fallback if null
+            homeLocation = viewModel.homeLocation ?: LatLng(56.1572, 10.2107),
+            hasPermission = viewModel.hasLocationPermission
         )
 
         // 2. UI LAYER
@@ -119,12 +140,6 @@ fun MapHomeScreen(
                     onSettingsClick = onSettingsClick,
                 )
             }
-        } else {
-            PermissionDeniedUI(
-                onGrantClick = {
-                    permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                }
-            )
         }
     }
 }
@@ -325,6 +340,7 @@ fun GoogleMapBackground(
     isRouteActive: Boolean,
     routePoints: List<LatLng>,
     homeLocation: LatLng,
+    hasPermission: Boolean,
     modifier: Modifier = Modifier
 ) {
     // Default camera position (can be adjusted)
@@ -353,7 +369,7 @@ fun GoogleMapBackground(
         ),
         properties = MapProperties(
             // Enables the blue dot if permission is granted
-            isMyLocationEnabled = true
+            isMyLocationEnabled = hasPermission
         )
     ) {
         if (isRouteActive && routePoints.isNotEmpty()) {

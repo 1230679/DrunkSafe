@@ -30,6 +30,7 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
     // --- STATE VARIABLES ---
 
     // Permission Status
+
     var hasLocationPermission by mutableStateOf(false)
         private set
 
@@ -62,8 +63,8 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
 
     // --- ACTIONS ---
 
-    fun updatePermissionStatus(granted: Boolean) {
-        hasLocationPermission = granted
+    fun updatePermissionStatus(isGranted: Boolean) {
+        hasLocationPermission = isGranted
     }
 
     fun loadHomeLocation() {

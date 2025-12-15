@@ -19,6 +19,7 @@ import com.example.drunksafe.viewmodel.LoginViewModel
 import com. example.drunksafe.viewmodel. SetupState
 import com.example.drunksafe.viewmodel.SetupViewModel
 import com.example.drunksafe.viewmodel.TrustedContactsViewModel
+import com.example.drunksafe.components.LocationPermissionScreen
 
 
 import com.example.drunksafe.ui.theme.DarkBackground
@@ -50,7 +51,17 @@ fun AppNavHost(
 
     GoogleMapsCheckDialog()
 
-    NavHost(navController = navController, startDestination = "login") {
+    NavHost(navController = navController, startDestination = "permission_check") {
+        composable("permission_check") {
+            LocationPermissionScreen(
+                onPermissionGranted = {
+                    navController.navigate("login") {
+                        popUpTo("permission_check") { inclusive = true }
+                    }
+                }
+            )
+        }
+
         composable("login") {
             LoginScreen(
                 onLoginSuccess = { uid ->
