@@ -123,7 +123,7 @@ fun HomeAddressScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Botão GUARDAR
+            // SAVE
             Button(
                 onClick = {
                     if (addressText.isBlank()) {
