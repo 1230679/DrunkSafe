@@ -1,7 +1,6 @@
 package com.example.drunksafe.data.repositories
 
 import android.util.Log
-import com.example.drunksafe.data.DirectionsResponse
 import com.example.drunksafe.data.services.RetrofitClient
 
 class DirectionsRepository {

@@ -30,14 +30,19 @@ import com.example.drunksafe.ui.theme.GreenAccent
 import com.example.drunksafe.ui.theme.CardBackground
 
 
-// Data class for country codes
+/**
+ * Data class representing a country's phone code and flag.
+ * Used for the dropdown selector in the contact form.
+ */
 data class CountryCode(
     val country: String,
     val code: String,
     val flag: String
 )
 
-// List of common country codes
+/**
+ * A predefined list of common European and North American country codes.
+ */
 val countryCodes = listOf(
     CountryCode("Portugal", "+351", "🇵🇹"),
     CountryCode("Spain", "+34", "🇪🇸"),
@@ -61,12 +66,28 @@ val countryCodes = listOf(
     CountryCode("Canada", "+1", "🇨🇦")
 )
 
+/**
+ * Data model for the contact form input state.
+ */
 data class EmergencyContactInput(
     val name: String = "",
     val phone: String = "",
     val countryCode: CountryCode = countryCodes[0] // Default to Portugal
 )
 
+/**
+ * The Setup Screen (Onboarding).
+ *
+ * This screen collects essential safety information from the user:
+ * 1. **Emergency Contacts:** A dynamic list where users can add multiple trusted contacts.
+ * 2. **Home Address:** The destination used for the "Take me Home" feature.
+ *
+ * It includes validation to ensure at least one valid contact and an address are provided
+ * before allowing completion. It also offers a "Skip" option with a confirmation dialog.
+ *
+ * @param onSetupComplete Callback triggered when the user saves their data. Returns a list of contacts and the home address string.
+ * @param onSkipSetup Callback triggered if the user chooses to skip the setup process.
+ */
 @Composable
 fun SetupScreen(
     onSetupComplete: (List<EmergencyContactInput>, String) -> Unit,
@@ -300,6 +321,14 @@ fun SetupScreen(
     }
 }
 
+
+/**
+ * A reusable card component for entering a single contact's details.
+ * Contains a name field and a phone field with a country code dropdown.
+ *
+ * @param contact The current state of this contact input.
+ * @param onContactChange Callback to update the state of this specific contact.
+ */
 @Composable
 fun ContactInputCard(
     contact: EmergencyContactInput,

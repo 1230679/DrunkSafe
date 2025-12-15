@@ -11,6 +11,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 
+
+/**
+ * A Composable that checks for the presence of the Google Maps application on the device.
+ *
+ * This component runs a check immediately upon composition. It displays an [AlertDialog] informing
+ * the user of the requirement and providing a direct link to the Play Store to install it.
+ *
+ */
 @Composable
 fun GoogleMapsCheckDialog() {
     val context = LocalContext.current
@@ -57,11 +65,3 @@ fun GoogleMapsCheckDialog() {
     }
 }
 
-private fun isGoogleMapsInstalled(context: Context): Boolean {
-    return try {
-        context.packageManager.getPackageInfo("com.google.android.apps.maps", 0)
-        true
-    } catch (e: PackageManager.NameNotFoundException) {
-        false
-    }
-}

@@ -26,6 +26,20 @@ import com.example.drunksafe.ui.theme.GoldYellow
 import com.example.drunksafe.ui.theme.GreenArrow
 import com.example.drunksafe.ui.theme.White
 
+
+/**
+ * Screen for editing and saving the User's Home Address.
+ *
+ * This screen performs two critical functions:
+ * 1. **Input:** Allows the user to type their address as text.
+ * 2. **Geocoding:** Uses the Android [Geocoder] API to convert that text into
+ * Latitude and Longitude coordinates.
+ *
+ * These coordinates are then saved to SharedPreferences so the "Take Me Home"
+ * feature can calculate a route without needing to look up the address again.
+ *
+ * @param onNavigateBack Callback triggered when the user saves successfully or clicks the back button.
+ */
 @Composable
 fun HomeAddressScreen(
     onNavigateBack: () -> Unit

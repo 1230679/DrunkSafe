@@ -28,6 +28,21 @@ import com.example.drunksafe.ui.theme.DarkBlue
 import com.example.drunksafe.ui.theme.GoldYellow
 import com.example.drunksafe.ui.theme.CardBackground
 
+/**
+ * Screen for managing Trusted Contacts.
+ *
+ * This screen allows the user to:
+ * 1. View a list of their trusted contacts.
+ * 2. Add new contacts to the list.
+ * 3. Search through existing contacts.
+ * 4. Quickly initiate communication (Call or SMS) with a selected contact.
+ *
+ * It uses a [LazyColumn] for efficient list rendering and various [Dialog] composables
+ * for user interactions.
+ *
+ * @param onNavigateBack Callback to handle the back navigation.
+ * @param viewModel The ViewModel that manages the list of contacts and search logic.
+ */
 @Composable
 fun TrustedContactsScreen(
     onNavigateBack: () -> Unit = {},
@@ -170,6 +185,10 @@ fun TrustedContactsScreen(
     }
 }
 
+/**
+ * A single item row in the contacts list.
+ * Displays the contact name and a "Notify" button.
+ */
 @Composable
 fun ContactCard(contact: TrustedContact, onNotifyClick: () -> Unit) {
     Card(
@@ -196,6 +215,9 @@ fun ContactCard(contact: TrustedContact, onNotifyClick: () -> Unit) {
     }
 }
 
+/**
+ * Dialog to choose between calling or messaging a contact.
+ */
 @Composable
 fun NotifyOptionsDialog(
     contact: TrustedContact,
@@ -279,6 +301,10 @@ fun NotifyOptionsDialog(
     }
 }
 
+/**
+ * Dialog for composing an SMS message.
+ * Includes pre-defined quick messages for safety scenarios.
+ */
 @Composable
 fun SendMessageDialog(
     contact: TrustedContact,
@@ -409,6 +435,9 @@ fun SendMessageDialog(
     }
 }
 
+/**
+ * Dialog form to input Name and Phone Number for a new contact.
+ */
 @Composable
 fun AddContactDialog(onDismiss: () -> Unit, onAddContact: (String, String) -> Unit) {
     var name by remember { mutableStateOf("") }

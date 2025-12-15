@@ -29,6 +29,24 @@ import com.example.drunksafe.ui.theme.DarkBackground
 import com.example.drunksafe.ui.theme.GoldAccent
 import com.example.drunksafe.ui.theme.GreenAccent
 
+
+/**
+ * The user authentication screen.
+ *
+ * This Composable provides the interface for existing users to sign in to the application.
+ * It includes:
+ * 1. Email and Password validation.
+ * 2. Password visibility toggling.
+ * 3. A "Forgot Password" workflow via email reset.
+ * 4. Navigation to the Sign-Up screen for new users.
+ *
+ * It observes the [LoginViewModel] state to handle loading indicators, error messages,
+ * and successful authentication events.
+ *
+ * @param onLoginSuccess Callback triggered when authentication is successful. Passes the User ID [String].
+ * @param onSignUpRequested Callback triggered when the user taps the "Sign Up" button.
+ * @param viewModel The ViewModel managing authentication state and logic.
+ */
 @Composable
 fun LoginScreen(
     onLoginSuccess: (userId: String) -> Unit,

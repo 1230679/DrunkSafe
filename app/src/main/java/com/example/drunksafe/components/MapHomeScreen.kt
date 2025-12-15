@@ -44,6 +44,22 @@ import com.example.drunksafe.ui.theme.GoldYellow
 import com.example.drunksafe.ui.theme.RouteBlue
 import com.example.drunksafe.ui.theme.White
 
+
+/**
+ * The Main Dashboard Screen of the application.
+ *
+ * This screen orchestrates the Google Maps experience and switches between three distinct states:
+ * 1. **Permission Denied:** Shows a prompt to enable location services.
+ * 2. **Search Mode (Default):** Displays the map, a search bar, the "Take Me Home" button, and the bottom navigation.
+ * 3. **Navigation Mode:** Displays the active route, distance/duration info, and a Stop button.
+ *
+ * It utilizes [GoogleMapBackground] for the map rendering and overlays UI components using a [Box] layout.
+ *
+ * @param onEmergencyAlertClick Callback for the bottom nav Emergency button.
+ * @param onCallTrustedContactsClick Callback for the bottom nav Contacts button.
+ * @param onProfileClick Callback for the bottom nav Profile button.
+ * @param viewModel The state holder for map logic and location data.
+ */
 @Composable
 fun MapHomeScreen(
     onEmergencyAlertClick: () -> Unit,
@@ -104,20 +120,19 @@ fun MapHomeScreen(
                 )
             }
         } else {
-            // Permission Denied: Show Error UI
             PermissionDeniedUI(
-                onGrantClick = { permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION) },
-                onOpenSettingsClick = {
-                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                        data = Uri.fromParts("package", context.packageName, null)
-                    }
-                    context.startActivity(intent)
+                onGrantClick = {
+                    permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                 }
             )
         }
     }
 }
 
+/**
+ * The Default UI overlay when the user is idle (not navigating).
+ * Contains the Search Bar, the primary "Take Me Home" CTA, and the Bottom Navigation Bar.
+ */
 @Composable
 fun SearchModeUI(
     viewModel: MapViewModel,
@@ -207,6 +222,10 @@ fun SearchModeUI(
     }
 }
 
+/**
+ * The Active UI overlay when a route is calculated.
+ * Shows trip details and a button to launch external turn-by-turn navigation.
+ */
 @Composable
 fun NavigationModeUI(
     viewModel: MapViewModel,
@@ -253,57 +272,54 @@ fun NavigationModeUI(
     }
 }
 
+/**
+ * Fallback UI shown when Location Permission is denied.
+ */
 @Composable
 fun PermissionDeniedUI(
-    onGrantClick: () -> Unit,
-    onOpenSettingsClick: () -> Unit
+    onGrantClick: () -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White.copy(alpha = 0.95f)), // Semi-transparent overlay
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(32.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.LocationOff,
-                contentDescription = null,
-                tint = ErrorRed,
-                modifier = Modifier.size(64.dp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+    AlertDialog(
+        onDismissRequest = {
+            //the user needs to make a decision, that's why this is empty
+        },
+        title = {
             Text(
-                text = "Location Required",
-                fontSize = 22.sp,
+                text = "Permission Required",
                 fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
                 color = DarkBlue
             )
-            Spacer(modifier = Modifier.height(8.dp))
+        },
+        text = {
             Text(
-                text = "To guide you home safely, DrunkSafe needs access to your location.",
+                text = "You cannot use DrunkSafe without location access.\n\n" +
+                        "This app relies on your GPS to guide you home safely. " +
+                        "Please grant permission to continue.",
                 fontSize = 16.sp,
-                color = Color.Gray,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                color = Color.Gray
             )
-            Spacer(modifier = Modifier.height(24.dp))
+        },
+        confirmButton = {
             Button(
                 onClick = onGrantClick,
                 colors = ButtonDefaults.buttonColors(backgroundColor = GoldYellow),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Allow Access", color = DarkBlue, fontWeight = FontWeight.Bold)
+                Text("TRY AGAIN", color = DarkBlue, fontWeight = FontWeight.Bold)
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            TextButton(onClick = onOpenSettingsClick) {
-                Text("Open Settings", color = Color.Gray)
-            }
-        }
-    }
+        },
+        backgroundColor = Color.White,
+        shape = RoundedCornerShape(16.dp)
+    )
 }
 
+/**
+ * A wrapper around the Google Maps Compose SDK.
+ * Handles camera updates and drawing the route polyline.
+ *
+ * @param hasPermission Controls the `isMyLocationEnabled` property to prevent crashes.
+ */
 @Composable
 fun GoogleMapBackground(
     isRouteActive: Boolean,
@@ -355,6 +371,9 @@ fun GoogleMapBackground(
     }
 }
 
+/**
+ * A detail card shown during navigation, displaying distance, duration, and the Start Navigation button.
+ */
 @Composable
 fun NavigationInfoCard(
     distance: String,
@@ -413,7 +432,9 @@ fun NavigationInfoCard(
     }
 }
 
-// Helper composable for Bottom Bar Items
+/**
+ * Helper component for consistent Bottom Navigation items.
+ */
 @Composable
 fun RowScope.BottomBarItem(iconRes: Int, onClick: () -> Unit) {
     Box(

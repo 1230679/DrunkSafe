@@ -28,6 +28,22 @@ import kotlinx.coroutines.delay
 import com.example.drunksafe.ui.theme.AlertRed
 import com.example.drunksafe.ui.theme.DarkBlue
 
+/**
+ * The Emergency (SOS) Screen.
+ *
+ * This screen provides a quick and accessible way for the user to trigger an emergency alert.
+ * To prevent accidental triggers, it implements a safety mechanism requiring the user to
+ * tap the SOS button 3 times consecutively within a short time window.
+ *
+ * When triggered, it:
+ * 1. Composes an SMS to all trusted contacts with a predefined distress message.
+ * 2. Opens the system SMS app with these numbers pre-filled.
+ * 3. Shows a confirmation dialog allowing a direct call to emergency services (112).
+ *
+ * @param onNavigateBack Callback to handle the back button press.
+ * @param contactsViewModel The ViewModel providing the list of trusted contacts.
+ */
+
 @Composable
 fun EmergencyScreen(
     onNavigateBack: () -> Unit = {},
@@ -226,6 +242,17 @@ fun EmergencyScreen(
         )
     }
 }
+
+/**
+ * A Dialog displayed after the emergency alert is triggered.
+ *
+ * It confirms that the SMS app has been opened and provides an immediate
+ * button to call 112 (European Emergency Number).
+ *
+ * @param contactCount The number of contacts included in the SMS intent.
+ * @param onDismiss Handler for closing the dialog.
+ * @param onCall112 Handler for initiating the phone call to 112.
+ */
 
 @Composable
 fun AlertConfirmationDialog(

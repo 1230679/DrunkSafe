@@ -28,6 +28,21 @@ import com.example.drunksafe.ui.theme.DarkBackground
 import com.example.drunksafe.ui.theme.GoldAccent
 import com.example.drunksafe.ui.theme.GreenAccent
 
+/**
+ * The User Registration Screen.
+ *
+ * This screen allows new users to create an account by providing their name, email, and password.
+ * It implements real-time form validation to ensure data integrity before submission.
+ *
+ * **Features:**
+ * * **Live Validation:** Checks for valid email format and password length (min 6 chars).
+ * * **Password Confirmation:** Ensures the user didn't make a typo in their password.
+ * * **State Handling:** Displays loading spinners during network requests and error messages if registration fails.
+ *
+ * @param onSignUpDone Callback triggered when the account is successfully created. Passes the new User ID.
+ * @param onBackToLogin Callback to return to the Login screen if the user already has an account.
+ * @param viewModel The ViewModel handling the Firebase Authentication logic.
+ */
 @Composable
 fun SignUpScreen(
     onSignUpDone: (String) -> Unit,

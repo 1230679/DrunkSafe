@@ -13,6 +13,7 @@ import androidx. navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
 import com.example.drunksafe.components.GoogleMapsCheckDialog
+import com.example.drunksafe.ui.SignUpScreen
 import com.example.drunksafe.viewmodel.LoginViewModel
 import com. example.drunksafe.viewmodel. SetupState
 import com.example.drunksafe.viewmodel.SetupViewModel
@@ -21,6 +22,21 @@ import com.example.drunksafe.viewmodel.TrustedContactsViewModel
 
 import com.example.drunksafe.ui.theme.DarkBackground
 import com.example.drunksafe.ui.theme.GoldAccent
+
+/**
+ * The main Navigation Host for the DrunkSafe application.
+ *
+ * This Composable defines the navigation graph and manages the transition between
+ * different screens (destinations) in the app, such as Login, Sign Up, Setup,
+ * and the main Dashboard.
+ *
+ * It initializes key ViewModels and handles the logic for conditionally navigating
+ * users based on their authentication state and profile setup status.
+ *
+ * @param onLoggedIn A callback function triggered when the user successfully logs in
+ * or completes the sign-up process. It receives the user's unique
+ * identifier (UID) as a [String].
+ */
 
 @Composable
 fun AppNavHost(onLoggedIn: (String) -> Unit) {
@@ -100,27 +116,30 @@ fun AppNavHost(onLoggedIn: (String) -> Unit) {
                     }
                 },
                 onSkipSetup = {
-                    // Apenas navega para home sem guardar nada
-                    // O utilizador pode fazer o setup mais tarde
+                    // Navigate to home without saving data.
+                    // The user can complete setup later via Profile.
                     navController.navigate("dashboard") {
                         popUpTo("setup") { inclusive = true }
                     }
                 }
             )
         }
-    composable("dashboard") {
-        MapHomeScreen(
-            onEmergencyAlertClick = {
-                navController.navigate("emergency")
-            },
-            onCallTrustedContactsClick = {
-                navController.navigate("trustedContacts")
-            },
-            onProfileClick = {
-                navController.navigate("profile")
-            },
-        )
-    }
+
+        // --- Main Application Flow ---
+
+        composable("dashboard") {
+            MapHomeScreen(
+                onEmergencyAlertClick = {
+                    navController.navigate("emergency")
+                },
+                onCallTrustedContactsClick = {
+                    navController.navigate("trustedContacts")
+                },
+                onProfileClick = {
+                    navController.navigate("profile")
+                },
+            )
+        }
 
 
         composable("trustedContacts") {

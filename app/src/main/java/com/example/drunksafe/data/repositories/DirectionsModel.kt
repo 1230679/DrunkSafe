@@ -1,9 +1,9 @@
-package com.example.drunksafe.data
+package com.example.drunksafe.data.repositories
 
 import com.google.gson.annotations.SerializedName
 
 /**
- * Modelos de dados para a resposta da Google Directions API.
+ * Models for the Google Directions API response.
  */
 
 data class DirectionsResponse(
