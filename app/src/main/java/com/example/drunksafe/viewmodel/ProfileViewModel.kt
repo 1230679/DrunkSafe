@@ -2,8 +2,8 @@ package com.example.drunksafe.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.drunksafe.data.UserProfile
-import com.example.drunksafe.data.UserRepository
+import com.example.drunksafe.data.repositories.UserProfile
+import com.example.drunksafe.data.repositories.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

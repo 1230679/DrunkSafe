@@ -57,14 +57,14 @@ import com.example.drunksafe.ui.theme.White
  *
  * @param onEmergencyAlertClick Callback for the bottom nav Emergency button.
  * @param onCallTrustedContactsClick Callback for the bottom nav Contacts button.
- * @param onProfileClick Callback for the bottom nav Profile button.
+ * @param onSettingsClick Callback for the bottom nav settings button.
  * @param viewModel The state holder for map logic and location data.
  */
 @Composable
 fun MapHomeScreen(
     onEmergencyAlertClick: () -> Unit,
     onCallTrustedContactsClick: () -> Unit,
-    onProfileClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     viewModel: MapViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -116,7 +116,7 @@ fun MapHomeScreen(
                     viewModel = viewModel,
                     onEmergencyAlertClick = onEmergencyAlertClick,
                     onCallTrustedContactsClick = onCallTrustedContactsClick,
-                    onProfileClick = onProfileClick
+                    onSettingsClick = onSettingsClick,
                 )
             }
         } else {
@@ -138,7 +138,7 @@ fun SearchModeUI(
     viewModel: MapViewModel,
     onEmergencyAlertClick: () -> Unit,
     onCallTrustedContactsClick: () -> Unit,
-    onProfileClick: () -> Unit
+    onSettingsClick: () -> Unit
 ) {
     var searchText by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -217,7 +217,7 @@ fun SearchModeUI(
             // Helper to create bottom bar items
             BottomBarItem(iconRes = R.drawable.icon_emergency, onClick = onEmergencyAlertClick)
             BottomBarItem(iconRes = R.drawable.icon_contactos, onClick = onCallTrustedContactsClick)
-            BottomBarItem(iconRes = R.drawable.icon_perfil, onClick = onProfileClick)
+            BottomBarItem(iconRes = R.drawable.icon_perfil, onClick = onSettingsClick)
         }
     }
 }
@@ -375,7 +375,7 @@ fun GoogleMapBackground(
  * A detail card shown during navigation, displaying distance, duration, and the Start Navigation button.
  */
 @Composable
-fun NavigationInfoCard(
+fun NavigationInfoCard (
     distance: String,
     duration: String,
     modifier: Modifier = Modifier,

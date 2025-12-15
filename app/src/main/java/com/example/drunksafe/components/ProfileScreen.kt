@@ -6,7 +6,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,15 +15,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.drunksafe.ui.components.PhoneNumberInputRow
-import com.example.drunksafe.ui.components.countryCodes
+import com.example.drunksafe.components.PhoneNumberInputRow
+import com.example.drunksafe.components.countryCodes
 import com.example.drunksafe.viewmodel.ProfileViewModel
 import java.util.Calendar
 
+import com.example.drunksafe.ui.theme.CardBackground
+import com.example.drunksafe.ui.theme.GoldAccent
+
 import com.example.drunksafe.ui.theme.BackgroundDark
-import com.example.drunksafe.ui.theme.ItemBlue
-import com.example.drunksafe.ui.theme.AlertRed
 import com.example.drunksafe.ui.theme.GoldYellow
+import com.example.drunksafe.ui.theme.GreenAccent
 import com.example.drunksafe.ui.theme.GreenArrow
 
 @Composable
@@ -66,12 +69,12 @@ fun ProfileScreen(
                 title = { Text("Profile", color = Color.White, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Green)
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = GreenAccent)
                     }
                 },
                 actions = {
                     IconButton(onClick = { isEditing = !isEditing; viewModel.clearMessages() }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Gold)
+                        Icon(Icons.Default.Edit, contentDescription = "Edit", tint = GoldYellow)
                     }
                 }
             )
@@ -85,7 +88,7 @@ fun ProfileScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Card(backgroundColor = CardBlue, modifier = Modifier.fillMaxWidth()) {
+            Card(backgroundColor = CardBackground, modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
                     Text("Name", color = Color.Gray)
@@ -96,11 +99,11 @@ fun ProfileScreen(
                         modifier = Modifier.fillMaxWidth(),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             textColor = Color.White,
-                            focusedBorderColor = Gold,
+                            focusedBorderColor = GoldAccent,
                             unfocusedBorderColor = Color.Gray,
                             disabledTextColor = Color.White,
                             disabledBorderColor = Color.DarkGray,
-                            cursorColor = Gold
+                            cursorColor = GoldAccent
                         ),
                         singleLine = true
                     )
@@ -135,10 +138,10 @@ fun ProfileScreen(
                             onCountrySelected = { viewModel.onPhoneCountryCodeChange(it.code) },
                             onPhoneNumberChanged = { viewModel.onPhoneNumberChange(it) },
                             borderColor = Color.Gray,
-                            focusedBorderColor = Gold,
+                            focusedBorderColor = GoldAccent,
                             textColor = Color.White,
                             placeholderColor = Color.Gray,
-                            cursorColor = Gold
+                            cursorColor = GoldAccent
                         )
                     }
 
@@ -160,7 +163,7 @@ fun ProfileScreen(
                     if (isEditing) {
                         Button(
                             onClick = { openDatePicker(uiState.dateOfBirth) },
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Gold),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = GreenAccent),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("Edit date of birth", color = BackgroundDark, fontWeight = FontWeight.Bold)
@@ -177,12 +180,12 @@ fun ProfileScreen(
                     OutlinedButton(
                         onClick = { isEditing = false; viewModel.loadProfile() },
                         modifier = Modifier.weight(1f)
-                    ) { Text("Cancel", color = Gold) }
+                    ) { Text("Cancel", color = GoldYellow) }
 
                     Button(
                         onClick = { viewModel.saveProfile(); isEditing = false },
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Gold)
+                        colors = ButtonDefaults.buttonColors(backgroundColor = GoldYellow)
                     ) { Text("Save", color = BackgroundDark, fontWeight = FontWeight.Bold) }
                 }
             }

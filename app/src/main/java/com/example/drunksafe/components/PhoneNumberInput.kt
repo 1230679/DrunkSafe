@@ -1,4 +1,4 @@
-package com.example.drunksafe.ui.components
+package com.example.drunksafe.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -83,7 +84,7 @@ fun PhoneNumberInputRow(
                     contentColor = textColor
                 ),
                 border = ButtonDefaults.outlinedBorder.copy(
-                    brush = androidx.compose.ui.graphics.SolidColor(borderColor)
+                    brush = SolidColor(borderColor)
                 )
             ) {
                 Text(

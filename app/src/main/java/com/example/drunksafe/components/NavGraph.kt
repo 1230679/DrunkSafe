@@ -79,28 +79,9 @@ fun AppNavHost(
 
         composable("checkSetup") {
             val state by setupViewModel.state. collectAsState()
-            val context = androidx.compose.ui.platform.LocalContext.current
-            val prefs = remember { com.example.drunksafe.data.HomeAddressPreferences(context) }
-            val userRepo = remember { com.example.drunksafe.data.UserRepository() }
-            val auth = remember { com.google.firebase.auth.FirebaseAuth.getInstance() }
-
 
             LaunchedEffect(Unit) {
                 setupViewModel.checkIfSetupNeeded()
-            }
-
-            LaunchedEffect(Unit) {
-                val uid = auth.currentUser?.uid ?: return@LaunchedEffect
-
-                val profile = userRepo.getUserProfile(uid) ?: return@LaunchedEffect
-                val address = profile.homeAddress
-
-                val lat = profile.homeLat
-                val lng = profile.homeLng
-
-                if (!address.isNullOrBlank() && lat != null && lng != null) {
-                    prefs.saveHomeAddress(address = address, lat = lat, lng = lng)
-                }
             }
 
             LaunchedEffect(state) {
@@ -119,7 +100,6 @@ fun AppNavHost(
                 }
             }
 
-            // Loading enquanto verifica
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = DarkBackground
@@ -129,6 +109,7 @@ fun AppNavHost(
                 }
             }
         }
+
 
         composable("setup") {
             SetupScreen(
@@ -150,22 +131,21 @@ fun AppNavHost(
             )
         }
 
+        // --- Main Application Flow ---
+
         composable("dashboard") {
-        MapHomeScreen(
-            onTakeMeHomeClick = {
-                navController.navigate("route_in_progress")
-            },
-            onEmergencyAlertClick = {
-                navController.navigate("emergency")
-            },
-            onCallTrustedContactsClick = {
-                navController.navigate("trustedContacts")
-            },
-            onSettingsClick = {
-                navController.navigate("settings")
-            }
-        )
-    }
+            MapHomeScreen(
+                onEmergencyAlertClick = {
+                    navController.navigate("emergency")
+                },
+                onCallTrustedContactsClick = {
+                    navController.navigate("trustedContacts")
+                },
+                onSettingsClick = {
+                    navController.navigate("settings")
+                },
+            )
+        }
 
 
         composable("trustedContacts") {
